@@ -12,5 +12,6 @@ namespace HomeLibrary.DAL.Entities
         [Required]
         public string Title { get; set; }
         public ICollection<Author> Authors { get; set; }
+        public ICollection<Image> Images { get; set; }
     }
 }

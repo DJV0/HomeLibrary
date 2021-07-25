@@ -11,5 +11,8 @@ namespace HomeLibrary.DAL.Entities
     {
         [Required]
         public string Url { get; set; }
+
+        public int BookId { get; set; }
+        public Book Book { get; set; }
     }
 }
