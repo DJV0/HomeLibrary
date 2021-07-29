@@ -1,3 +1,6 @@
+using HomeLibrary.BLL.Interfaces;
+using HomeLibrary.BLL.Mapping;
+using HomeLibrary.BLL.Services;
 using HomeLibrary.DAL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,6 +40,11 @@ namespace HomeLibrary.WebAPI
 
             services.AddDbContext<HomeLibraryDbContext>(options =>
                 options.UseSqlServer(Configuration["ConnectionStrings:HomeLibraryDatabase"]));
+
+            services.AddTransient<HomeLibraryDbContext>();
+            services.AddTransient<IImageService, ImageService>();
+
+            services.AddAutoMapper(typeof(ImageProfile));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
