@@ -23,9 +23,13 @@ namespace HomeLibrary.BLL.Services
             _mapper = mapper;
         }
 
-        public Task AddAsync(ImageDTO entity)
+        public async Task<int> AddAsync(ImageDTO entity)
         {
-            throw new NotImplementedException();
+            var image = _mapper.Map<Image>(entity);
+            if (await ExistImage(image.Id)) throw new ArgumentException("Invalid indut data!");
+            await _context.Images.AddAsync(image);
+            await _context.SaveChangesAsync();
+            return image.Id;
         }
 
         public Task Delete(int id)
@@ -48,6 +52,10 @@ namespace HomeLibrary.BLL.Services
         public Task UpdateAsync(ImageDTO entity)
         {
             throw new NotImplementedException();
+        }
+        private async Task<bool> ExistImage(int? id)
+        {
+            return await _context.Images.FindAsync(id) != null;
         }
     }
 }
