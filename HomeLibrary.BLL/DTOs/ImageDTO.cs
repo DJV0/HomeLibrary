@@ -9,5 +9,6 @@ namespace HomeLibrary.BLL.DTOs
     public class ImageDTO : BaseEntity
     {
         public string Url { get; set; }
+        public int BookId { get; set; }
     }
 }
