@@ -38,5 +38,12 @@ namespace HomeLibrary.WebAPI.Controllers
             var imageId = await _imageService.AddAsync(image);
             return CreatedAtAction(nameof(Get), new { id = imageId }, await _imageService.GetAsync(imageId));
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            await _imageService.DeleteAsync(id);
+            return NoContent();
+        }
     }
 }
