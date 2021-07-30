@@ -32,9 +32,13 @@ namespace HomeLibrary.BLL.Services
             return image.Id;
         }
 
-        public Task Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var image = await _context.Images.FindAsync(id);
+            if(image == null) throw new ArgumentException("Invalid indut data!");
+            _context.Images.Remove(image);
+            await _context.SaveChangesAsync();
+
         }
 
         public async Task<ICollection<ImageDTO>> GetAllAsync()
