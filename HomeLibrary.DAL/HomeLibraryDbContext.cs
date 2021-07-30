@@ -16,6 +16,8 @@ namespace HomeLibrary.DAL
         public HomeLibraryDbContext(DbContextOptions options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Image>(entity => { entity.HasIndex(e => e.Url).IsUnique(); });
+
             modelBuilder.Entity<Author>().HasData(
                 new Author { Id = 1, FirstName = "F1", MiddleName = "M1", LastName = "L1" },
                 new Author { Id = 2, FirstName = "F2", MiddleName = "", LastName = "L2" },
