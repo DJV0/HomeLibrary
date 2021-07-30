@@ -31,5 +31,12 @@ namespace HomeLibrary.WebAPI.Controllers
         {
             return Ok(await _imageService.GetAsync(id));
         }
+
+        [HttpPost]
+        public async Task<ActionResult> Post([FromBody] ImageDTO image)
+        {
+            var imageId = await _imageService.AddAsync(image);
+            return CreatedAtAction(nameof(Get), new { id = imageId }, await _imageService.GetAsync(imageId));
+        }
     }
 }
