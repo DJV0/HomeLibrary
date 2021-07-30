@@ -13,6 +13,6 @@ namespace HomeLibrary.BLL.Interfaces
         Task<T> GetAsync(int id);
         Task<int> AddAsync(T entity);
         Task UpdateAsync(T entity);
-        Task Delete(int id);
+        Task DeleteAsync(int id);
     }
 }
