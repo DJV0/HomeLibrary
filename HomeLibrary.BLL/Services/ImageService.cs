@@ -53,9 +53,12 @@ namespace HomeLibrary.BLL.Services
             return _mapper.Map<ImageDTO>(image);
         }
 
-        public Task UpdateAsync(ImageDTO entity)
+        public async Task UpdateAsync(ImageDTO entity)
         {
-            throw new NotImplementedException();
+            var image = await _context.Images.FindAsync(entity.Id);
+            if (image == null) throw new ArgumentException("Invalid input data!");
+            _context.Entry(image).CurrentValues.SetValues(entity);
+            await _context.SaveChangesAsync();
         }
         private async Task<bool> ExistImage(int? id)
         {
