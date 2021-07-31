@@ -23,13 +23,13 @@ namespace HomeLibrary.BLL.Services
             _mapper = mapper;
         }
 
-        public async Task<int> AddAsync(ImageDTO entity)
+        public async Task<ImageDTO> AddAsync(ImageDTO entity)
         {
             var image = _mapper.Map<Image>(entity);
             if (await ExistImage(image.Id)) throw new ArgumentException("Invalid indut data!");
             await _context.Images.AddAsync(image);
             await _context.SaveChangesAsync();
-            return image.Id;
+            return _mapper.Map<ImageDTO>(image);
         }
 
         public async Task DeleteAsync(int id)

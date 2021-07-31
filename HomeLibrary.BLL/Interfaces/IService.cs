@@ -11,7 +11,7 @@ namespace HomeLibrary.BLL.Interfaces
     {
         Task<ICollection<T>> GetAllAsync();
         Task<T> GetAsync(int id);
-        Task<int> AddAsync(T entity);
+        Task<T> AddAsync(T entity);
         Task UpdateAsync(T entity);
         Task DeleteAsync(int id);
     }

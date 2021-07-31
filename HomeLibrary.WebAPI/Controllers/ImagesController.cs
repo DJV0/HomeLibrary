@@ -35,8 +35,8 @@ namespace HomeLibrary.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] ImageDTO image)
         {
-            var imageId = await _imageService.AddAsync(image);
-            return CreatedAtAction(nameof(Get), new { id = imageId }, await _imageService.GetAsync(imageId));
+            var newImage = await _imageService.AddAsync(image);
+            return CreatedAtAction(nameof(Get), new { id = newImage.Id }, newImage);
         }
 
         [HttpDelete("{id}")]
