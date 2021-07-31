@@ -41,11 +41,11 @@ namespace HomeLibrary.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] ImageDTO entity)
+        public async Task<ActionResult> Put(int id, [FromBody] ImageDTO image)
         {
-            if (id != entity.Id) ModelState.AddModelError("Id", "Input Id doesn't match.");
+            if (id != image.Id) ModelState.AddModelError("Id", "Input Id doesn't match.");
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            await _imageService.UpdateAsync(entity);
+            await _imageService.UpdateAsync(image);
             return Ok();
         }
 

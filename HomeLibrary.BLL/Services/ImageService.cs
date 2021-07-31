@@ -60,7 +60,7 @@ namespace HomeLibrary.BLL.Services
             _context.Entry(image).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
         }
-        private async Task<bool> ExistImage(int? id)
+        private async Task<bool> ExistImage(int id)
         {
             return await _context.Images.FindAsync(id) != null;
         }
