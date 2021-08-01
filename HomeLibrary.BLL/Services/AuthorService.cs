@@ -52,9 +52,12 @@ namespace HomeLibrary.BLL.Services
             return _mapper.Map<AuthorDTO>(author);
         }
 
-        public Task UpdateAsync(AuthorDTO entity)
+        public async Task UpdateAsync(AuthorDTO entity)
         {
-            throw new NotImplementedException();
+            var author = await _context.Authors.FindAsync(entity.Id);
+            if(author == null) throw new ArgumentException("Invalid input data.");
+            _context.Entry(author).CurrentValues.SetValues(entity);
+            await _context.SaveChangesAsync();
         }
 
         private async Task<bool> ExistAuthor(int id)
