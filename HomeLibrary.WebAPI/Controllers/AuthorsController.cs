@@ -40,6 +40,15 @@ namespace HomeLibrary.WebAPI.Controllers
             return CreatedAtAction(nameof(Get), new { id = newAuthor.Id }, newAuthor);
         }
 
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Put(int id, [FromBody] AuthorDTO author)
+        {
+            if (id != author.Id) ModelState.AddModelError("Id", "Input Id doesn't match.");
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            await _authorService.UpdateAsync(author);
+            return Ok();
+        }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
