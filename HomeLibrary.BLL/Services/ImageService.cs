@@ -26,7 +26,7 @@ namespace HomeLibrary.BLL.Services
         public async Task<ImageDTO> AddAsync(ImageDTO entity)
         {
             var image = _mapper.Map<Image>(entity);
-            if (await ExistImage(image.Id)) throw new ArgumentException("Invalid indut data!");
+            if (await ExistImage(image.Id)) throw new ArgumentException("The enter image id has already existed");
             await _context.Images.AddAsync(image);
             await _context.SaveChangesAsync();
             return _mapper.Map<ImageDTO>(image);
@@ -35,7 +35,7 @@ namespace HomeLibrary.BLL.Services
         public async Task DeleteAsync(int id)
         {
             var image = await _context.Images.FindAsync(id);
-            if(image == null) throw new ArgumentException("Invalid indut data!");
+            if(image == null) throw new ArgumentException("The enter image id doesn't exist.");
             _context.Images.Remove(image);
             await _context.SaveChangesAsync();
 
@@ -56,7 +56,7 @@ namespace HomeLibrary.BLL.Services
         public async Task UpdateAsync(ImageDTO entity)
         {
             var image = await _context.Images.FindAsync(entity.Id);
-            if (image == null) throw new ArgumentException("Invalid input data!");
+            if (image == null) throw new ArgumentException("The enter image doesn't exist.");
             _context.Entry(image).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
         }

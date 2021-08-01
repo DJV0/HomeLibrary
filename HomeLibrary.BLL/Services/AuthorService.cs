@@ -26,7 +26,7 @@ namespace HomeLibrary.BLL.Services
         public async Task<AuthorDTO> AddAsync(AuthorDTO entity)
         {
             var author = _mapper.Map<Author>(entity);
-            if (await ExistAuthor(author.Id)) throw new ArgumentException("Invalid input data.");
+            if (await ExistAuthor(author.Id)) throw new ArgumentException("The enter author id has already existed");
             await _context.Authors.AddAsync(author);
             await _context.SaveChangesAsync();
             return _mapper.Map<AuthorDTO>(author);
@@ -35,7 +35,7 @@ namespace HomeLibrary.BLL.Services
         public async Task DeleteAsync(int id)
         {
             var author = await _context.Authors.FindAsync(id);
-            if(author == null) throw new ArgumentException("Invalid input data.");
+            if(author == null) throw new ArgumentException("The enter author id doesn't exist.");
             _context.Authors.Remove(author);
             await _context.SaveChangesAsync();
         }
@@ -55,7 +55,7 @@ namespace HomeLibrary.BLL.Services
         public async Task UpdateAsync(AuthorDTO entity)
         {
             var author = await _context.Authors.FindAsync(entity.Id);
-            if(author == null) throw new ArgumentException("Invalid input data.");
+            if(author == null) throw new ArgumentException("The enter author doesn't exist.");
             _context.Entry(author).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
         }
