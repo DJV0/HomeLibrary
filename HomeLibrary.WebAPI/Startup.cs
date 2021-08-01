@@ -44,8 +44,9 @@ namespace HomeLibrary.WebAPI
             services.AddTransient<HomeLibraryDbContext>();
             services.AddTransient<IImageService, ImageService>();
             services.AddTransient<IAuthorService, AuthorService>();
+            services.AddTransient<IBookService, BookService>();
 
-            services.AddAutoMapper(typeof(ImageProfile), typeof(AuthorProfile));
+            services.AddAutoMapper(typeof(ImageProfile), typeof(AuthorProfile), typeof(BookProfile));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
