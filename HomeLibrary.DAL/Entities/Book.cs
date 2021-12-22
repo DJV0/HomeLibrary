@@ -13,5 +13,6 @@ namespace HomeLibrary.DAL.Entities
         public string Title { get; set; }
         public virtual ICollection<Author> Authors { get; set; }
         public virtual ICollection<Image> Images { get; set; }
+        public virtual ICollection<Tag> Tags { get; set; }
     }
 }
