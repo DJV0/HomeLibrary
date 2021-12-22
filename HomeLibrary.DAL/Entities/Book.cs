@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace HomeLibrary.DAL.Entities
 {
-    public class Book : BaseEntity
+    public class Book
     {
-        [Required]
+        public int Id { get; set; }
         public string Title { get; set; }
-        public ICollection<Author> Authors { get; set; }
-        public ICollection<Image> Images { get; set; }
+        public virtual ICollection<Author> Authors { get; set; }
+        public virtual ICollection<Image> Images { get; set; }
     }
 }

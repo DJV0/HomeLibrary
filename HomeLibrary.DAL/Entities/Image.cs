@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace HomeLibrary.DAL.Entities
 {
-    public class Image : BaseEntity
+    public class Image
     {
-        [Required]
+        public int Id { get; set; }
         public string Url { get; set; }
 
         public int BookId { get; set; }
