@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using HomeLibrary.BLL.DTOs;
+using HomeLibrary.Shared.Dto;
 
 namespace HomeLibrary.BLL.Interfaces
 {
-    public interface IAuthorService : IService<AuthorDTO>
+    public interface IAuthorService : IGenericService<AuthorDto>
     {
     }
 }
