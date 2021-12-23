@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HomeLibrary.DAL\HomeLibrary.DAL.csproj" />
+    <ProjectReference Include="..\HomeLibrary.Shared\HomeLibrary.Shared.csproj" />
   </ItemGroup>
 
 </Project>
