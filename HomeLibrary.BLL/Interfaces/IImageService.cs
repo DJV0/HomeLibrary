@@ -1,4 +1,4 @@
-﻿using HomeLibrary.Shared.Dto;
+﻿using HomeLibrary.DAL.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HomeLibrary.BLL.Interfaces
 {
-    public interface IImageService : IGenericService<ImageDto>
+    public interface IImageService : IGenericService<Image>
     {
     }
 }
