@@ -1,4 +1,4 @@
-﻿using HomeLibrary.BLL.DTOs;
+﻿using HomeLibrary.Shared.Dto;
 using HomeLibrary.BLL.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using HomeLibrary.DAL.Entities;
 
 namespace HomeLibrary.WebAPI.Controllers
 {
@@ -15,37 +17,39 @@ namespace HomeLibrary.WebAPI.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
-        public BooksController(IBookService bookService)
+        private readonly IMapper _mapper;
+        public BooksController(IBookService bookService, IMapper mapper)
         {
             _bookService = bookService;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<BookDTO>>> Get()
+        public async Task<ActionResult<ICollection<BookDto>>> Get()
         {
-            return Ok(await _bookService.GetAllAsync());
+            return Ok(_mapper.Map<ICollection<BookDto>>(await _bookService.GetAllAsync()));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<BookDTO>> Get(int id)
+        public async Task<ActionResult<BookDto>> Get(int id)
         {
-            return Ok(await _bookService.GetAsync(id));
+            return Ok(_mapper.Map<BookDto>(await _bookService.GetByIdAsync(id)));
         }
 
-        [HttpPost]
-        public async Task<ActionResult> Post([FromBody] BookDTO book)
+        [HttpPost("Create")]
+        public async Task<ActionResult> Create([FromBody] BookDto bookDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var newBook = await _bookService.AddAsync(book);
-            return CreatedAtAction(nameof(Get), new { id = newBook.Id }, newBook);
+            var newBook = await _bookService.AddAsync(_mapper.Map<Book>(bookDto));
+            return CreatedAtAction(nameof(Get), new { id = newBook.Id }, _mapper.Map<BookDto>(newBook));
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] BookDTO book)
+        public async Task<ActionResult> Update(int id, [FromBody] BookDto bookDto)
         {
-            if (id != book.Id) ModelState.AddModelError("Id", "Input Id doesn't match.");
+            if (id != bookDto.Id) ModelState.AddModelError("Id", "Input Id doesn't match.");
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            await _bookService.UpdateAsync(book);
+            await _bookService.UpdateAsync(_mapper.Map<Book>(bookDto));
             return Ok();
         }
 

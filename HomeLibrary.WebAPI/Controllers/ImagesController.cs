@@ -1,4 +1,4 @@
-﻿using HomeLibrary.BLL.DTOs;
+﻿using HomeLibrary.Shared.Dto;
 using HomeLibrary.BLL.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HomeLibrary.DAL.Entities;
+using AutoMapper;
 
 namespace HomeLibrary.WebAPI.Controllers
 {
@@ -15,37 +17,39 @@ namespace HomeLibrary.WebAPI.Controllers
     public class ImagesController : ControllerBase
     {
         private readonly IImageService _imageService;
-        public ImagesController(IImageService imageService)
+        private readonly IMapper _mapper;
+        public ImagesController(IImageService imageService, IMapper mapper)
         {
             _imageService = imageService;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<ImageDTO>>> Get()
+        public async Task<ActionResult<ICollection<ImageDto>>> Get()
         {
-            return Ok(await _imageService.GetAllAsync());
+            return Ok(_mapper.Map<ICollection<ImageDto>>(await _imageService.GetAllAsync()));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ImageDTO>> Get(int id)
+        public async Task<ActionResult<ImageDto>> Get(int id)
         {
-            return Ok(await _imageService.GetAsync(id));
+            return Ok(_mapper.Map<ImageDto>(await _imageService.GetByIdAsync(id)));
         }
 
-        [HttpPost]
-        public async Task<ActionResult> Post([FromBody] ImageDTO image)
+        [HttpPost("Create")]
+        public async Task<ActionResult> Create([FromBody] ImageDto imageDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var newImage = await _imageService.AddAsync(image);
-            return CreatedAtAction(nameof(Get), new { id = newImage.Id }, newImage);
+            var newImage = await _imageService.AddAsync(_mapper.Map<Image>(imageDto));
+            return CreatedAtAction(nameof(Get), new { id = newImage.Id }, _mapper.Map<ImageDto>(newImage));
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] ImageDTO image)
+        public async Task<ActionResult> Update(int id, [FromBody] ImageDto imageDto)
         {
-            if (id != image.Id) ModelState.AddModelError("Id", "Input Id doesn't match.");
+            if (id != imageDto.Id) ModelState.AddModelError("Id", "Input Id doesn't match.");
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            await _imageService.UpdateAsync(image);
+            await _imageService.UpdateAsync(_mapper.Map<Image>(imageDto));
             return Ok();
         }
 

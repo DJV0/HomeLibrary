@@ -1,7 +1,4 @@
-using HomeLibrary.BLL.Interfaces;
-using HomeLibrary.BLL.Mapping;
-using HomeLibrary.BLL.Services;
-using HomeLibrary.DAL;
+using HomeLibrary.BLL.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -38,15 +35,7 @@ namespace HomeLibrary.WebAPI
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "HomeLibrary", Version = "v1" });
             });
 
-            services.AddDbContext<HomeLibraryDbContext>(options =>
-                options.UseSqlServer(Configuration["ConnectionStrings:HomeLibraryDatabase"]));
-
-            services.AddTransient<HomeLibraryDbContext>();
-            services.AddTransient<IImageService, ImageService>();
-            services.AddTransient<IAuthorService, AuthorService>();
-            services.AddTransient<IBookService, BookService>();
-
-            services.AddAutoMapper(typeof(ImageProfile), typeof(AuthorProfile), typeof(BookProfile));
+            services.ConfigureBusinessLogicLayerDI(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
