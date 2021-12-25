@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeLibrary.DAL.Migrations
 {
     [DbContext(typeof(HomeLibraryDbContext))]
-    [Migration("20211222104141_AddBookTags")]
-    partial class AddBookTags
+    [Migration("20211225173720_AddBookTag")]
+    partial class AddBookTag
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -231,7 +231,7 @@ namespace HomeLibrary.DAL.Migrations
 
                     b.HasKey("Name");
 
-                    b.ToTable("Tag");
+                    b.ToTable("Tags");
 
                     b.HasData(
                         new

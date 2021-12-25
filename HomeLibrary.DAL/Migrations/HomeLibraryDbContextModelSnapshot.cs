@@ -229,7 +229,7 @@ namespace HomeLibrary.DAL.Migrations
 
                     b.HasKey("Name");
 
-                    b.ToTable("Tag");
+                    b.ToTable("Tags");
 
                     b.HasData(
                         new

@@ -2,19 +2,19 @@
 
 namespace HomeLibrary.DAL.Migrations
 {
-    public partial class AddBookTags : Migration
+    public partial class AddBookTag : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Tag",
+                name: "Tags",
                 columns: table => new
                 {
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tag", x => x.Name);
+                    table.PrimaryKey("PK_Tags", x => x.Name);
                 });
 
             migrationBuilder.CreateTable(
@@ -34,25 +34,25 @@ namespace HomeLibrary.DAL.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_BookTag_Tag_TagsName",
+                        name: "FK_BookTag_Tags_TagsName",
                         column: x => x.TagsName,
-                        principalTable: "Tag",
+                        principalTable: "Tags",
                         principalColumn: "Name",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
-                table: "Tag",
+                table: "Tags",
                 column: "Name",
                 value: "книга 2021");
 
             migrationBuilder.InsertData(
-                table: "Tag",
+                table: "Tags",
                 column: "Name",
                 value: "музыка");
 
             migrationBuilder.InsertData(
-                table: "Tag",
+                table: "Tags",
                 column: "Name",
                 value: "наука");
 
@@ -83,7 +83,7 @@ namespace HomeLibrary.DAL.Migrations
                 name: "BookTag");
 
             migrationBuilder.DropTable(
-                name: "Tag");
+                name: "Tags");
         }
     }
 }
