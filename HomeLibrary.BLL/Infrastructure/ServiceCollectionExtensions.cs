@@ -22,6 +22,7 @@ namespace HomeLibrary.BLL.Infrastructure
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<IAuthorService, AuthorService>();
             services.AddScoped<IBookService, BookService>();
+            services.AddScoped<ITagService, TagService>();
 
             var mapperConfiguration = new MapperConfiguration(config =>
             {
