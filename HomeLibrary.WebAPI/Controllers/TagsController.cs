@@ -45,15 +45,6 @@ namespace HomeLibrary.WebAPI.Controllers
             return CreatedAtAction(nameof(Get), new { name = newTag.Name }, _mapper.Map<TagDto>(newTag));
         }
 
-        [HttpPut("{name}")]
-        public async Task<ActionResult> Update(string name, [FromBody] TagDto tagDto)
-        {
-            if (name != tagDto.Name) ModelState.AddModelError("name", "Entered name doesnt match!");
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            await _tagService.UpdateAsync(_mapper.Map<Tag>(tagDto));
-            return Ok();
-        }
-
         [HttpDelete("{name}")]
         public async Task<ActionResult> Delete(string name)
         {
