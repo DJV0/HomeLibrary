@@ -3,14 +3,16 @@ using HomeLibrary.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HomeLibrary.DAL.Migrations
 {
     [DbContext(typeof(HomeLibraryDbContext))]
-    partial class HomeLibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211231094847_UpdateBookAndAuthor")]
+    partial class UpdateBookAndAuthor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
