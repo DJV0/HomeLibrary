@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace HomeLibrary.BLL.Services
 {
-    //TODO: Try to use second parament(Dto) as retuned value method
     public abstract class GenericService<T> : IGenericService<T> where T: class
     {
         protected readonly HomeLibraryDbContext dbContext;
@@ -37,21 +36,19 @@ namespace HomeLibrary.BLL.Services
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task<ICollection<T>> GetAllAsync()
+        public virtual async Task<ICollection<T>> GetAllAsync()
         {
             return await dbContext.Set<T>().ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public virtual async Task<T> GetByIdAsync(int id)
         {
             return await dbContext.Set<T>().FindAsync(id);
         }
 
-        //TODO: Test update
         public async Task UpdateAsync(T entity)
         {
             dbContext.Set<T>().Update(entity);
-            //dbContext.Entry(entity).CurrentValues.SetValues(entity);
             await dbContext.SaveChangesAsync();
         }
     }
