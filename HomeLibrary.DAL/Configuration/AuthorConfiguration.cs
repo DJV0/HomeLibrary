@@ -18,9 +18,9 @@ namespace HomeLibrary.DAL.Configuration
             builder.Property(author => author.LastName).IsRequired();
 
             builder.HasData(
-                new Author { Id = 1, FirstName = "F1", MiddleName = "M1", LastName = "L1" },
-                new Author { Id = 2, FirstName = "F2", MiddleName = "", LastName = "L2" },
-                new Author { Id = 3, FirstName = "F3", MiddleName = "M3", LastName = "L3" }
+                new Author { Id = 1, FirstName = "F1", LastName = "L1" },
+                new Author { Id = 2, FirstName = "F2", LastName = "L2" },
+                new Author { Id = 3, FirstName = "F3", LastName = "L3" }
                 );
 
         }
