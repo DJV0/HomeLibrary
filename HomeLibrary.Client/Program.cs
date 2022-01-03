@@ -1,3 +1,4 @@
+using HomeLibrary.Client.HttpClients;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,9 +18,7 @@ namespace HomeLibrary.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
-            //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-            builder.Services.AddHttpClient();
-
+            builder.Services.AddHttpClient<OpenLibraryClient>();
             await builder.Build().RunAsync();
         }
     }
