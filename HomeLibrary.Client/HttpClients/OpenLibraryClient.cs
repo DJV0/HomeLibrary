@@ -16,9 +16,9 @@ namespace HomeLibrary.Client.HttpClients
         public OpenLibraryClient(HttpClient client)
         {
             _client = client;
-            _client.BaseAddress = new Uri("https://openlibrary.org/api/");
+            _client.BaseAddress = new Uri("https://openlibrary.org");
             _client.Timeout = new TimeSpan(0, 0, 30);
-            _client.DefaultRequestHeaders.Clear();
+            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             _jsonContractRevolser = new PropertyRenameSerializerContractResolver();
         }
@@ -27,8 +27,7 @@ namespace HomeLibrary.Client.HttpClients
         {
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
-                $"books?bibkeys=ISBN:{isbn}&jscmd=data&format=json");
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                $"/api/books?bibkeys=ISBN:{isbn}&jscmd=data&format=json");
 
             _jsonContractRevolser.RenameProperty(typeof(OpenLibraryBookDto), "ISBN:{ }", $"ISBN:{isbn}");
             var serializerSettings = new JsonSerializerSettings();
