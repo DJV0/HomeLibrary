@@ -1,6 +1,7 @@
 ﻿@page "/"
-@using HomeLibrary.Shared.Dto
 @using HomeLibrary.Client.HttpClients
+@using HomeLibrary.Shared.Dto
+@inject OpenLibraryClient openLibraryClient
 @inject AuthorClient authorClient
 
 <div>
@@ -8,16 +9,28 @@
 
     Welcome to your new app.
 
+    <EditForm Model="@ISBN" OnValidSubmit="Send">
+        <InputText @bind-Value="@ISBN"></InputText>
+        <button type="submit">Send</button>
+    </EditForm>
+    @if(book.Book != null){
+    <p>@book.cover.large</p>
+    }
     <p>@author.FirstName</p>
 </div>
 
-@code {
-    AuthorDto author;
+@code { 
+    public string ISBN { get; set; } = String.Empty;
+    OpenLibraryBookDto book = new OpenLibraryBookDto();
+    AuthorDto author = new AuthorDto();
 
+    public async Task Send()
+    {
+        book = await openLibraryClient.GetBook(ISBN);
+    }
     protected override async Task OnInitializedAsync()
     {
         author = await authorClient.GetById(1);
     }
-
 
 }
