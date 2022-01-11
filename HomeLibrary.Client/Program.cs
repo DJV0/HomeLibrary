@@ -19,6 +19,11 @@ namespace HomeLibrary.Client
             builder.RootComponents.Add<App>("#app");
 
             builder.Services.AddHttpClient<OpenLibraryClient>();
+            builder.Services.AddHttpClient<AuthorClient>();
+            builder.Services.AddHttpClient<ImageClient>();
+            builder.Services.AddHttpClient<BookClient>();
+            builder.Services.AddHttpClient<TagClient>();
+
             await builder.Build().RunAsync();
         }
     }
