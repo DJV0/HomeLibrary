@@ -1,124 +1,33 @@
 ﻿@page "/"
-@using Newtonsoft.Json;
+@using HomeLibrary.Client.HttpClients
+@using HomeLibrary.Shared.Dto
+@inject OpenLibraryClient openLibraryClient
 
 <div>
     <h1>Hello, world!</h1>
 
     Welcome to your new app.
 
-    <EditForm Model="@ISBN1" OnValidSubmit="Send">
-        <InputText @bind-Value="@ISBN1"></InputText>
+    <EditForm Model="@ISBN" OnValidSubmit="Send">
+        <InputText @bind-Value="@ISBN"></InputText>
         <button type="submit">Send</button>
     </EditForm>
+    @if(book.Book != null)
+    {
+        <p>@book.Book.cover.large</p>
+    }
+    else
+    {
+        <p>Empty</p>
+    }
 </div>
 
 @code { 
-    public string ISBN1 { get; set; } = String.Empty;
-
-    [Inject]
-    public IHttpClientFactory httpClientFactory { get; set; }
+    public string ISBN { get; set; } = String.Empty;
+    OpenLibraryBookDto book = new OpenLibraryBookDto();
 
     public async Task Send()
     {
-        var client = httpClientFactory.CreateClient();
-
-        var request = new HttpRequestMessage(
-            HttpMethod.Get,
-            $"https://openlibrary.org/api/books?bibkeys=ISBN:{ISBN1}&jscmd=data&format=json");
-
-        using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
-        {
-            var stream = await response.Content.ReadAsStringAsync();
-            response.EnsureSuccessStatusCode();
-            var result = JsonConvert.DeserializeObject<Root>(stream);
-            var r = result.ISBN9780980200447.title;
-        }
+        book = await openLibraryClient.GetBook(ISBN);
     }
-
-    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
-    public class Publisher
-    {
-        public string name { get; set; }
-    }
-
-    public class Identifiers
-    {
-        public List<string> google { get; set; }
-        public List<string> lccn { get; set; }
-        public List<string> isbn_13 { get; set; }
-        public List<string> amazon { get; set; }
-        public List<string> isbn_10 { get; set; }
-        public List<string> oclc { get; set; }
-        public List<string> librarything { get; set; }
-        public List<string> project_gutenberg { get; set; }
-        public List<string> goodreads { get; set; }
-    }
-
-    public class Classifications
-    {
-        public List<string> dewey_decimal_class { get; set; }
-        public List<string> lc_classifications { get; set; }
-    }
-
-    public class Link
-    {
-        public string url { get; set; }
-        public string title { get; set; }
-    }
-
-    public class Cover
-    {
-        public string small { get; set; }
-        public string large { get; set; }
-        public string medium { get; set; }
-    }
-
-    public class Subject
-    {
-        public string url { get; set; }
-        public string name { get; set; }
-    }
-
-    public class Author
-    {
-        public string url { get; set; }
-        public string name { get; set; }
-    }
-
-    public class Excerpt
-    {
-        public string comment { get; set; }
-        public string text { get; set; }
-    }
-
-    public class PublishPlace
-    {
-        public string name { get; set; }
-    }
-
-    public class ISBN9780980200447
-    {
-        public List<Publisher> publishers { get; set; }
-        public Identifiers identifiers { get; set; }
-        public Classifications classifications { get; set; }
-        public List<Link> links { get; set; }
-        public string weight { get; set; }
-        public string title { get; set; }
-        public string url { get; set; }
-        public int number_of_pages { get; set; }
-        public Cover cover { get; set; }
-        public List<Subject> subjects { get; set; }
-        public string publish_date { get; set; }
-        public List<Author> authors { get; set; }
-        public List<Excerpt> excerpts { get; set; }
-        public List<PublishPlace> publish_places { get; set; }
-    }
-
-    public class Root
-    {
-        [JsonProperty("ISBN:9780980200447")]
-        public ISBN9780980200447 ISBN9780980200447 { get; set; }
-    }
-
-
 }
