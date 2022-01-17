@@ -1,4 +1,5 @@
 using HomeLibrary.Client.HttpClients;
+using HomeLibrary.Client.Infrastructure;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,8 @@ namespace HomeLibrary.Client
             builder.Services.AddHttpClient<ImageClient>();
             builder.Services.AddHttpClient<BookClient>();
             builder.Services.AddHttpClient<TagClient>();
+            builder.Services.AddSingleton(opt => 
+                new UploadFileService(builder.Configuration.GetConnectionString("AzureBlobStorage")));
 
             await builder.Build().RunAsync();
         }
