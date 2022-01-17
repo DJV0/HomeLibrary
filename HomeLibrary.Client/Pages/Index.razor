@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using HomeLibrary.Client.HttpClients
 @using HomeLibrary.Shared.Dto
+@using HomeLibrary.Client.Infrastructure
 @inject OpenLibraryClient openLibraryClient
 @inject AuthorClient authorClient
 
@@ -9,14 +10,23 @@
 
     Welcome to your new app.
 
-    <EditForm Model="@ISBN" OnValidSubmit="Send">
+    <EditForm Model="@ISBN" OnValidSubmit="@Send">
         <InputText @bind-Value="@ISBN"></InputText>
         <button type="submit">Send</button>
     </EditForm>
-    @if(book.Book != null){
-    <p>@book.cover.large</p>
+    @if (book.Book != null)
+    {
+        <p>@book.Book.cover.large</p>
     }
     <p>@author.FirstName</p>
+
+    <InputFile OnChange="@HandleSelected"></InputFile>
+    @if (ImgUrl != null)
+    {
+        <div>
+            <img src="@ImgUrl" style="width:300px" />
+        </div>
+    }
 </div>
 
 @code { 
@@ -24,13 +34,33 @@
     OpenLibraryBookDto book = new OpenLibraryBookDto();
     AuthorDto author = new AuthorDto();
 
-    public async Task Send()
+    [Parameter]
+    public string ImgUrl { get; set; }
+    [Parameter]
+    public EventCallback<string> OnChange { get; set; }
+    [Inject]
+    public UploadFileService uploadFileService { get; set; }
+
+    private async Task Send()
     {
         book = await openLibraryClient.GetBook(ISBN);
     }
+
     protected override async Task OnInitializedAsync()
     {
         author = await authorClient.GetById(1);
     }
 
+    private async Task HandleSelected(InputFileChangeEventArgs e)
+    {
+        var imageFiles = e.GetMultipleFiles();
+        foreach (var imageFile in imageFiles)
+        {
+            if(imageFile != null)
+            {
+                ImgUrl = await uploadFileService.UploadAsync(imageFile);
+                //await OnChange.InvokeAsync(ImgUrl);
+            }
+        }
+    }
 }
