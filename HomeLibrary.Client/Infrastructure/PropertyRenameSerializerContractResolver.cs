@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace HomeLibrary.Client
+namespace HomeLibrary.Client.Infrastructure
 {
     public class PropertyRenameSerializerContractResolver : DefaultContractResolver
     {

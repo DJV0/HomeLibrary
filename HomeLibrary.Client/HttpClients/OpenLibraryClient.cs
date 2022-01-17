@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using HomeLibrary.Client.Infrastructure;
 using HomeLibrary.Shared.Dto;
 using Newtonsoft.Json;
 
@@ -11,8 +12,8 @@ namespace HomeLibrary.Client.HttpClients
 {
     public class OpenLibraryClient
     {
-        private HttpClient _client;
-        private PropertyRenameSerializerContractResolver _jsonContractRevolser;
+        private readonly HttpClient _client;
+        private readonly PropertyRenameSerializerContractResolver _jsonContractRevolser;
         public OpenLibraryClient(HttpClient client)
         {
             _client = client;
