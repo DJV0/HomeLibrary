@@ -15,6 +15,8 @@ namespace HomeLibrary.DAL.Configuration
         {
             builder.HasKey(book => book.Id);
             builder.Property(book => book.Title).IsRequired();
+            builder.Property(book => book.PublishDate).IsRequired();
+            builder.Property(book => book.NumberOfPages).IsRequired();
             builder.HasIndex(book => book.ISBN).IsUnique();
             builder
                 .HasMany<Image>(book => book.Images)
@@ -23,9 +25,9 @@ namespace HomeLibrary.DAL.Configuration
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasData(
-                new Book { Id = 1, Title = "Title1", ISBN = "9784353434", PublishDate = 2013 },
-                new Book { Id = 2, Title = "Title2", ISBN = "9784300434", PublishDate = 2014 },
-                new Book { Id = 3, Title = "Title3", ISBN = "9784340434", PublishDate = 2015 }
+                new Book { Id = 1, Title = "Title1", ISBN = "9784353434", PublishDate = 2013, NumberOfPages = 10 },
+                new Book { Id = 2, Title = "Title2", ISBN = "9784300434", PublishDate = 2014, NumberOfPages = 20 },
+                new Book { Id = 3, Title = "Title3", ISBN = "9784340434", PublishDate = 2015, NumberOfPages = 30 }
                 );
 
             builder

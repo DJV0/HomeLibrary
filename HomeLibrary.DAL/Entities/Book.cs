@@ -13,6 +13,7 @@ namespace HomeLibrary.DAL.Entities
         public string Title { get; set; }
         public string ISBN { get; set; }
         public int PublishDate { get; set; }
+        public int NumberOfPages { get; set; }
         public virtual ICollection<Author> Authors { get; set; }
         public virtual ICollection<Image> Images { get; set; }
         public virtual ICollection<Tag> Tags { get; set; }
