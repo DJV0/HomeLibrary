@@ -1,0 +1,26 @@
+﻿@inject NavigationManager NavigationManager
+
+<MudDialog Options="dialogOptions">
+    <DialogContent>
+        <MudTextField @bind-Value="ISBN" Label="ISBN" Variant="Variant.Text" Required="true"></MudTextField>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@(()=> MudDialog.Cancel())">Create book</MudButton>
+        <MudButton OnClick="SearchBook">Search</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; }
+    private DialogOptions dialogOptions = new DialogOptions() { DisableBackdropClick = true };
+
+    [Parameter]
+    public string ISBN { get; set; }
+
+
+    private void SearchBook()
+    {
+        MudDialog.Close(DialogResult.Ok<string>(ISBN));
+    }
+}

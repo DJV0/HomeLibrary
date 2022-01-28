@@ -1,0 +1,179 @@
+﻿@page "/CreateBook"
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@using AutoMapper
+
+<h3>Create book</h3>
+
+<EditForm Model="BookDto" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudTextField Label="Isbn" Required="true" @bind-Value="BookDto.ISBN" For="@(()=>BookDto.ISBN)" />
+            <MudTextField Label="Title" Required="true" @bind-Value="BookDto.Title" For="@(()=>BookDto.Title)" />
+            <div>
+                <div class="d-inline-block">
+                    Authors
+                    @if(OpenLibraryBookDto.Book==null)
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="@(()=>_isOpenAuthorPopover = _isOpenAuthorPopover ? false : true)"></MudIconButton>
+                    }
+                    <MudChipSet AllClosable="@(OpenLibraryBookDto.Book==null ? true:false)" OnClose="@(chip => RemoveAuthor(chip.Text))">
+                        @foreach (var author in BookDto.Authors)
+                        {
+                            <MudChip Text="@author.FullName"></MudChip>
+                        }
+                    </MudChipSet>
+                    <MudPopover Open="@_isOpenAuthorPopover" Class="pa-4" OverflowBehavior="OverflowBehavior.FlipNever" AnchorOrigin="Origin.CenterRight" TransformOrigin="Origin.CenterLeft">
+                        <MudField>
+                            <input list="Authors" @oninput="@(args => _inputAuthor = args.Value.ToString().ToLower())" placeholder="Type to serch..." aria-describedby="button-add-author" />
+                            <a id="button-add-author" class="btn btn-primary" @onclick="@(()=>AddAuthor())">Add</a>
+                            <datalist id="Authors">
+                                @foreach (var author in filteredAuthors)
+                                {
+                                    <option value="@author.FullName"></option>
+                                }
+                            </datalist>
+                        </MudField>
+                    </MudPopover>
+                </div>
+            </div>
+            <MudTextField Label="Publish date" Required="true" @bind-Value="BookDto.PublishDate" For="@(()=>BookDto.PublishDate)" />
+            <MudTextField Label="Number of pages" Required="true" @bind-Value="BookDto.NumberOfPages" For="@(()=>BookDto.NumberOfPages)" />
+            <div>
+                <div class="d-flex">
+                    <MudText Typo="Typo.subtitle2">Images</MudText>
+                    <MudIconButton Icon="@Icons.Material.Filled.Add"></MudIconButton>
+                </div>
+                <MudGrid>
+                    @foreach (var image in BookDto.Images)
+                    {
+                        <MudItem xs="3">
+                            <MudCardMedia Image="@image.Url" Height="200" @onclick="@(()=>OpenFullScreenImage(image.Url))"></MudCardMedia>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </div>
+            <div>
+                <div class="d-inline-block">
+                    Tags 
+                    <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="@(()=> _isOpenTagPopover = _isOpenTagPopover ? false : true)"></MudIconButton>
+                    <MudPopover Open="@_isOpenTagPopover" Class="pa-4" OverflowBehavior="OverflowBehavior.FlipNever" AnchorOrigin="Origin.CenterRight" TransformOrigin="Origin.CenterLeft">
+                        <MudField>
+                            <input list="Tags" @oninput="@(args => _inputTag = args.Value.ToString().ToLower())" placeholder="Type to serch..." aria-describedby="button-add-tag"/>
+                            <a id="button-add-tag" class="btn btn-primary" @onclick="@(()=>AddTag())">Add</a>
+                            <datalist id="Tags">
+                                @foreach (var tag in filteredTags)
+                                {
+                                    <option value="@tag.Name"></option>
+                                }
+                            </datalist>
+                        </MudField>
+                    </MudPopover>
+                </div>
+                <MudChipSet AllClosable="true" OnClose="@(chip => RemoveTag(chip.Text))">
+                    @foreach (var tag in BookDto.Tags)
+                    {
+                        <MudChip Text="@tag.Name"></MudChip>
+                    }
+                </MudChipSet>
+            </div>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    private bool _isOpenTagPopover, _isOpenAuthorPopover;
+    private string _inputTag = String.Empty;
+    private string _inputAuthor = String.Empty;
+    private IEnumerable<TagDto> _tags;
+    private IEnumerable<AuthorDto> _authors;
+
+    [Inject]
+    public OpenLibraryClient OpenLibraryClient { get; set; }
+    [Inject]
+    public TagClient TagClient { get; set; }
+    [Inject]
+    public AuthorClient AuthorClient { get; set; }
+    [Inject]
+    public IMapper Mapper { get; set; }
+
+    public string ISBN { get; set; }
+    public OpenLibraryBookDto OpenLibraryBookDto { get; set; } = new OpenLibraryBookDto();
+    public BookDto BookDto { get; set; } = new BookDto();
+    public IEnumerable<TagDto> filteredTags => _tags.Where(tag => tag.Name.ToLower().Contains(_inputTag));
+    public IEnumerable<AuthorDto> filteredAuthors => _authors.Where(author => author.FullName.ToLower().Contains(_inputAuthor));
+
+    protected override async Task OnInitializedAsync()
+    {
+        _tags = await TagClient.GetAll();
+        var dialogParameters = new DialogParameters();
+        dialogParameters.Add("ISBN", ISBN);
+        var dialog = await DialogService.Show<CreateBookDialog>
+            (
+                "Add new book",
+                dialogParameters,
+                new DialogOptions() { DisableBackdropClick = true }
+            ).Result;
+        if (dialog.Cancelled)
+        {
+            _authors = await AuthorClient.GetAll();
+            return;
+        }
+        if (dialog.Data != null)
+        {
+            ISBN = dialog.Data as string;
+            OpenLibraryBookDto = await OpenLibraryClient.GetBook(ISBN);
+            if(OpenLibraryBookDto.Book == null)
+            {
+                _authors = await AuthorClient.GetAll();
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+                Snackbar.Add("Book wasn't founded!", Severity.Warning);
+                return;
+            }
+            BookDto = Mapper.Map<BookDto>(OpenLibraryBookDto);
+            BookDto.Images.Add(Mapper.Map<ImageDto>(OpenLibraryBookDto.Book.cover));
+        }
+    }
+
+    private void HandleSubmit()
+    {
+
+    }
+
+    private void OpenFullScreenImage(string url)
+    {
+        var dialogParameters = new DialogParameters();
+        dialogParameters.Add("Url", url);
+        var dialogOptions = new DialogOptions() { NoHeader = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = DialogService.Show<FullScreenImageDialog>("", dialogParameters, dialogOptions);
+    }
+
+    private void RemoveTag(string tagName)
+    {
+        var tag = BookDto.Tags.FirstOrDefault(tag => tag.Name == tagName);
+        BookDto.Tags.Remove(tag);
+    }
+
+    private void AddTag()
+    {
+        var selectedTag = _tags.FirstOrDefault(tag => tag.Name.ToLower().Contains(_inputTag));
+        if (selectedTag != null &&
+            BookDto.Tags.Count <= 10 &&
+            BookDto.Tags.FirstOrDefault(tag => tag.Name==selectedTag.Name) == null)
+            BookDto.Tags.Add(selectedTag);
+    }
+
+    private void AddAuthor()
+    {
+        var selectedAuthor = _authors.FirstOrDefault(author => author.FullName.ToLower().Contains(_inputAuthor));
+        if (selectedAuthor != null && BookDto.Authors.FirstOrDefault(author => author.Id == selectedAuthor.Id) == null)
+            BookDto.Authors.Add(selectedAuthor);
+    }
+
+    private void RemoveAuthor(string authorName)
+    {
+        var author = BookDto.Authors.FirstOrDefault(author => author.FullName == authorName);
+        BookDto.Authors.Remove(author);
+    }
+}
