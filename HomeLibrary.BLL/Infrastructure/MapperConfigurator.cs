@@ -13,7 +13,9 @@ namespace HomeLibrary.BLL.Infrastructure
     {
         public MapperConfigurator(IMapperConfigurationExpression config)
         {
-            config.CreateMap<Author, AuthorDto>().ReverseMap();
+            config.CreateMap<Author, AuthorDto>()
+                .ForMember(authorDto=>authorDto.FullName, opt=>opt.MapFrom(author=>author.FirstName+" "+author.LastName))
+                .ReverseMap();
             config.CreateMap<Image, ImageDto>().ReverseMap();
             config.CreateMap<Tag, TagDto>().ReverseMap();
             config.CreateMap<Book, BookDto>().ReverseMap();
