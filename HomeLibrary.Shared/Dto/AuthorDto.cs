@@ -11,10 +11,7 @@ namespace HomeLibrary.Shared.Dto
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage ="Enter first name")]
-        public string FirstName { get; set; }
-
-        [Required(ErrorMessage = "Enter last name")]
-        public string LastName { get; set; }
+        [Required(ErrorMessage ="Enter full name")]
+        public string FullName { get; set; }
     }
 }
