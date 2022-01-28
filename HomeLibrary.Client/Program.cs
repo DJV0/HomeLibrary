@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using MudBlazor.Services;
+using AutoMapper;
 
 namespace HomeLibrary.Client
 {
@@ -19,6 +21,8 @@ namespace HomeLibrary.Client
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
+            builder.Services.AddMudServices();
+
             builder.Services.AddHttpClient<OpenLibraryClient>();
             builder.Services.AddHttpClient<AuthorClient>();
             builder.Services.AddHttpClient<ImageClient>();
@@ -26,6 +30,12 @@ namespace HomeLibrary.Client
             builder.Services.AddHttpClient<TagClient>();
             builder.Services.AddSingleton(opt => 
                 new UploadFileService(builder.Configuration.GetConnectionString("AzureBlobStorage")));
+
+            var mapperConfiguration = new MapperConfiguration(config =>
+            {
+                config.AddProfile(new MapperConfigurator(config));
+            });
+            builder.Services.AddSingleton(mapperConfiguration.CreateMapper());
 
             await builder.Build().RunAsync();
         }
