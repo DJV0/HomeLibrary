@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLibrary.WebAPI", "HomeL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLibrary.Shared", "HomeLibrary.Shared\HomeLibrary.Shared.csproj", "{3671D045-AAF0-427F-BDD6-7DE51A24DC21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeLibrary.Client", "HomeLibrary.Client\HomeLibrary.Client.csproj", "{E4A19C60-414E-4F53-BD3B-155D50A74165}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeLibrary.Client", "HomeLibrary.Client\HomeLibrary.Client.csproj", "{E4A19C60-414E-4F53-BD3B-155D50A74165}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

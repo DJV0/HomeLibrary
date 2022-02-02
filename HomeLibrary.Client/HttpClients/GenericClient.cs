@@ -11,7 +11,7 @@ namespace HomeLibrary.Client.HttpClients
     public abstract class GenericClient<T> where T : class
     {
         protected readonly HttpClient httpClient;
-        private string _requestUri;
+        private readonly string _requestUri;
         public GenericClient(HttpClient client, string requestUri)
         {
             httpClient = client;
@@ -36,12 +36,13 @@ namespace HomeLibrary.Client.HttpClients
             return await JsonSerializer.DeserializeAsync<T>(stream);
         }
 
-        public async Task<T> Update(int id, T entity)
+        public async Task<bool> Update(int id, T entity)
         {
-            var response = await httpClient.PutAsJsonAsync(_requestUri, entity);
+            var response = await httpClient.PutAsJsonAsync($"{_requestUri}/{id}", entity);
             response.EnsureSuccessStatusCode();
-            var stream = await response.Content.ReadAsStreamAsync();
-            return await JsonSerializer.DeserializeAsync<T>(stream);
+            if (!response.IsSuccessStatusCode) return false;
+            return true;
+            
         }
 
         public async Task Delete(int id)

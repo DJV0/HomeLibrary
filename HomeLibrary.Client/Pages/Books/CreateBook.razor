@@ -41,20 +41,6 @@
             <MudTextField Label="Publish date" Required="true" @bind-Value="BookDto.PublishDate" For="@(()=>BookDto.PublishDate)" />
             <MudTextField Label="Number of pages" Required="true" @bind-Value="BookDto.NumberOfPages" For="@(()=>BookDto.NumberOfPages)" />
             <div>
-                <div class="d-flex">
-                    <MudText Typo="Typo.subtitle2">Images</MudText>
-                    <MudIconButton Icon="@Icons.Material.Filled.Add"></MudIconButton>
-                </div>
-                <MudGrid>
-                    @foreach (var image in BookDto.Images)
-                    {
-                        <MudItem xs="3">
-                            <MudCardMedia Image="@image.Url" Height="200" @onclick="@(()=>OpenFullScreenImage(image.Url))"></MudCardMedia>
-                        </MudItem>
-                    }
-                </MudGrid>
-            </div>
-            <div>
                 <div class="d-inline-block">
                     Tags 
                     <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="@(()=> _isOpenTagPopover = _isOpenTagPopover ? false : true)"></MudIconButton>
@@ -78,6 +64,21 @@
                     }
                 </MudChipSet>
             </div>
+            <div>
+                <div class="d-inline-block">
+                    Images
+                    <MudIconButton Icon="@Icons.Material.Filled.Add" @onclick="@(()=>AddImage())"></MudIconButton>
+                </div>
+                <MudGrid>
+                    @foreach (var image in BookDto.Images)
+                    {
+                        <MudItem xs="3">
+                            <MudCardMedia Image="@image.Url" Height="200" @onclick="@(()=>RemoveImage(image.Id))"></MudCardMedia>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </div>
+            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Save</MudButton>
         </MudItem>
     </MudGrid>
 </EditForm>
@@ -141,12 +142,15 @@
 
     }
 
-    private void OpenFullScreenImage(string url)
+    private void AddImage()
     {
-        var dialogParameters = new DialogParameters();
-        dialogParameters.Add("Url", url);
-        var dialogOptions = new DialogOptions() { NoHeader = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
-        var dialog = DialogService.Show<FullScreenImageDialog>("", dialogParameters, dialogOptions);
+
+    }
+
+    private void RemoveImage(int imageId)
+    {
+        var selectedImage = BookDto.Images.FirstOrDefault(image => image.Id == imageId);
+        if (selectedImage != null) BookDto.Images.Remove(selectedImage);
     }
 
     private void RemoveTag(string tagName)
