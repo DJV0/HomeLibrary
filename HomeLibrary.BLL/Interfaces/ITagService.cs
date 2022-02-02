@@ -7,13 +7,7 @@ using System.Threading.Tasks;
 
 namespace HomeLibrary.BLL.Interfaces
 {
-    public interface ITagService
+    public interface ITagService : IGenericService<Tag>
     {
-        Task<ICollection<Tag>> GetAllAsync();
-        Task<Tag> GetByNameAsync(string name);
-        Task<Tag> AddAsync(Tag tag);
-        Task UpdateAsync(Tag entity);
-        Task DeleteAsync(string name);
-        Task DeleteAsync(Tag tag);
     }
 }

@@ -43,9 +43,9 @@ namespace HomeLibrary.DAL.Configuration
                 .HasMany(book => book.Tags)
                 .WithMany(tag => tag.Books)
                 .UsingEntity(t => t.HasData(
-                    new { TagsName = "книга 2021", BooksId = 1 },
-                    new { TagsName = "наука", BooksId = 1 },
-                    new { TagsName = "музыка", BooksId = 2 }
+                    new { TagsId = 1, BooksId = 1 },
+                    new { TagsId = 3, BooksId = 1 },
+                    new { TagsId = 2, BooksId = 2 }
                     ));
         }
     }

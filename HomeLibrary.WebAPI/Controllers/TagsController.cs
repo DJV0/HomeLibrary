@@ -31,10 +31,10 @@ namespace HomeLibrary.WebAPI.Controllers
             return Ok(_mapper.Map<ICollection<TagDto>>(await _tagService.GetAllAsync()));
         }
 
-        [HttpGet("{name}")]
-        public async Task<ActionResult<TagDto>> Get(string name)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TagDto>> Get(int id)
         {
-            return Ok(_mapper.Map<TagDto>(await _tagService.GetByNameAsync(name)));
+            return Ok(_mapper.Map<TagDto>(await _tagService.GetByIdAsync(id)));
         }
 
         [HttpPost("Create")]
@@ -45,10 +45,10 @@ namespace HomeLibrary.WebAPI.Controllers
             return CreatedAtAction(nameof(Get), new { name = newTag.Name }, _mapper.Map<TagDto>(newTag));
         }
 
-        [HttpDelete("{name}")]
-        public async Task<ActionResult> Delete(string name)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
         {
-            await _tagService.DeleteAsync(name);
+            await _tagService.DeleteAsync(id);
             return NoContent();
         }
     }
