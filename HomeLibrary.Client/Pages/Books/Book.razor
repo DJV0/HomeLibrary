@@ -1,5 +1,8 @@
 ﻿@page "/book/{bookId:int}"
-@if(BookDto == null)
+@inject IDialogService DialogService
+@inject NavigationManager NavigationManager
+
+@if (BookDto == null)
 {
     <MudProgressLinear Color="Color.Primary" Class="my-5" Indeterminate="true"></MudProgressLinear>
 }
@@ -11,7 +14,7 @@ else
         <dd>
             @foreach (var author in BookDto.Authors)
             {
-            <MudText Class="d-inline-block pa-2" Typo="Typo.body1">@author.FullName</MudText>
+                <MudText Class="d-inline-block pa-2" Typo="Typo.body1">@author.FullName</MudText>
             }
         </dd>
         <dt>ISBN</dt>
@@ -34,11 +37,14 @@ else
             <MudGrid>
                 @foreach (var image in BookDto.Images)
                 {
-                <MudItem xs="3">
-                    <MudCardMedia Image="@image.Url" Height="200"></MudCardMedia>
-                </MudItem>
+                    <MudItem xs="3">
+                        <MudCardMedia Image="@image.Url" Height="200" @onclick="@(()=>OpenFullScreenImage(image.Url))"></MudCardMedia>
+                    </MudItem>
                 }
             </MudGrid>
+        </dd>
+        <dd>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(()=>NavigationManager.NavigateTo($"/editbook/{BookId}"))">Edit</MudButton>
         </dd>
     </dl>
 }
@@ -54,5 +60,13 @@ else
     protected override async Task OnInitializedAsync()
     {
         BookDto = await BookClient.GetById(BookId);
+    }
+
+    private void OpenFullScreenImage(string url)
+    {
+        var dialogParameters = new DialogParameters();
+        dialogParameters.Add("Url", url);
+        var dialogOptions = new DialogOptions() { NoHeader = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = DialogService.Show<FullScreenImageDialog>("", dialogParameters, dialogOptions);
     }
 }
