@@ -28,7 +28,8 @@ else
                     <div>
                         @foreach (var author in book.Authors)
                         {
-                            <MudText Class="d-inline-block pa-2" Typo="Typo.body1">@author.FullName</MudText>
+                            var href = $"/author/{author.Id}";
+                            <MudLink Href="@href" Class="pa-2" Typo="Typo.body1">@author.FullName</MudLink>
                         }
                     </div>
                     <MudText Typo="Typo.body2">Published in @book.PublishDate</MudText>
