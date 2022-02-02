@@ -1,4 +1,6 @@
-﻿using HomeLibrary.BLL.Interfaces;
+﻿using AutoMapper;
+using HomeLibrary.BLL.Infrastructure;
+using HomeLibrary.BLL.Interfaces;
 using HomeLibrary.DAL;
 using HomeLibrary.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +18,7 @@ namespace HomeLibrary.BLL.Services
         {
             return await dbContext.Books
                 .Include(book => book.Authors)
-                .Include(book => book.Images.Take(1))
+                .Include(book => book.Images)
                 .Include(book => book.Tags)
                 .ToListAsync();
         }
@@ -27,6 +29,16 @@ namespace HomeLibrary.BLL.Services
                 .Include(book => book.Images)
                 .Include(book => book.Tags)
                 .FirstOrDefaultAsync(book => book.Id == id);
+        }
+
+        public override async Task UpdateAsync(Book entity)
+        {
+            var dbBook = await GetByIdAsync(entity.Id);
+            dbBook.Authors.UpdateData(entity.Authors);
+            dbBook.Images.UpdateData(entity.Images);
+            dbBook.Tags.UpdateData(entity.Tags);
+            dbContext.Entry(dbBook).CurrentValues.SetValues(entity);
+            await dbContext.SaveChangesAsync();
         }
     }
 }

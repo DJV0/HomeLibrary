@@ -46,7 +46,7 @@ namespace HomeLibrary.BLL.Services
             return await dbContext.Set<T>().FindAsync(id);
         }
 
-        public async Task UpdateAsync(T entity)
+        public virtual async Task UpdateAsync(T entity)
         {
             dbContext.Set<T>().Update(entity);
             await dbContext.SaveChangesAsync();
