@@ -32,5 +32,33 @@ namespace HomeLibrary.BLL.Infrastructure
 
             return services;
         }
+
+        public static void UpdateData<T>(this ICollection<T> dbCollection, ICollection<T> updatedCollection, string idPropertyName = "Id")
+        {
+            var itemsToDelete = dbCollection
+                .Select(item => item.GetType().GetProperty(idPropertyName).GetValue(item))
+                .Except(updatedCollection.Select(item => item.GetType().GetProperty(idPropertyName).GetValue(item)));
+            var itemsToAdd = updatedCollection
+                .Select(item => item.GetType().GetProperty(idPropertyName).GetValue(item))
+                .Except(dbCollection.Select(item => item.GetType().GetProperty(idPropertyName).GetValue(item)));
+            if (itemsToDelete.Any())
+            {
+                foreach (var itemId in itemsToDelete)
+                {
+                    var itemToDelele = dbCollection
+                        .First(item => item.GetType().GetProperty(idPropertyName).GetValue(item).Equals(itemId));
+                    dbCollection.Remove(itemToDelele);
+                }
+            }
+            if (itemsToAdd.Any())
+            {
+                foreach (var itemId in itemsToAdd)
+                {
+                    var itemToAdd = updatedCollection
+                        .First(item => item.GetType().GetProperty(idPropertyName).GetValue(item).Equals(itemId));
+                    dbCollection.Add(itemToAdd);
+                }
+            }
+        }      
     }
 }
