@@ -2,6 +2,7 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @using AutoMapper
+@using System.IO
 
 <h3>Create book</h3>
 
@@ -14,7 +15,7 @@
             <div>
                 <div class="d-inline-block">
                     Authors
-                    @if(OpenLibraryBookDto.Book==null)
+                    @if (OpenLibraryBookDto.Book == null)
                     {
                         <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="@(()=>_isOpenAuthorPopover = _isOpenAuthorPopover ? false : true)"></MudIconButton>
                     }
@@ -42,11 +43,11 @@
             <MudTextField Label="Number of pages" Required="true" @bind-Value="BookDto.NumberOfPages" For="@(()=>BookDto.NumberOfPages)" />
             <div>
                 <div class="d-inline-block">
-                    Tags 
+                    Tags
                     <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="@(()=> _isOpenTagPopover = _isOpenTagPopover ? false : true)"></MudIconButton>
                     <MudPopover Open="@_isOpenTagPopover" Class="pa-4" OverflowBehavior="OverflowBehavior.FlipNever" AnchorOrigin="Origin.CenterRight" TransformOrigin="Origin.CenterLeft">
                         <MudField>
-                            <input list="Tags" @oninput="@(args => _inputTag = args.Value.ToString().ToLower())" placeholder="Type to serch..." aria-describedby="button-add-tag"/>
+                            <input list="Tags" @oninput="@(args => _inputTag = args.Value.ToString().ToLower())" placeholder="Type to serch..." aria-describedby="button-add-tag" />
                             <a id="button-add-tag" class="btn btn-primary" @onclick="@(()=>AddTag())">Add</a>
                             <datalist id="Tags">
                                 @foreach (var tag in filteredTags)
@@ -65,20 +66,24 @@
                 </MudChipSet>
             </div>
             <div>
-                <div class="d-inline-block">
-                    Images
-                    <MudIconButton Icon="@Icons.Material.Filled.Add" @onclick="@(()=>AddImage())"></MudIconButton>
-                </div>
                 <MudGrid>
-                    @foreach (var image in BookDto.Images)
+                    <MudItem>
+                        <MudText>Images</MudText>
+                    </MudItem>
+                    <MudItem>
+                        <InputFile id="input-file" OnChange="@HandleSelectedImages" multiple></InputFile>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid>
+                    @foreach (var imageUri in ImageFiles)
                     {
                         <MudItem xs="3">
-                            <MudCardMedia Image="@image.Url" Height="200" @onclick="@(()=>RemoveImage(image.Id))"></MudCardMedia>
+                            <MudCardMedia Image="@imageUri.Key" Height="200" @onclick="@(()=>ImageFiles.Remove(imageUri.Key))"></MudCardMedia>
                         </MudItem>
                     }
                 </MudGrid>
             </div>
-            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Save</MudButton>
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" Style="margin-top:20px;">Save</MudButton>
         </MudItem>
     </MudGrid>
 </EditForm>
@@ -102,6 +107,7 @@
     public string ISBN { get; set; }
     public OpenLibraryBookDto OpenLibraryBookDto { get; set; } = new OpenLibraryBookDto();
     public BookDto BookDto { get; set; } = new BookDto();
+    public Dictionary<string,IBrowserFile> ImageFiles { get; set; } = new Dictionary<string, IBrowserFile>();
     public IEnumerable<TagDto> filteredTags => _tags.Where(tag => tag.Name.ToLower().Contains(_inputTag));
     public IEnumerable<AuthorDto> filteredAuthors => _authors.Where(author => author.FullName.ToLower().Contains(_inputAuthor));
 
@@ -125,7 +131,7 @@
         {
             ISBN = dialog.Data as string;
             OpenLibraryBookDto = await OpenLibraryClient.GetBook(ISBN);
-            if(OpenLibraryBookDto.Book == null)
+            if (OpenLibraryBookDto.Book == null)
             {
                 _authors = await AuthorClient.GetAll();
                 Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
@@ -142,15 +148,17 @@
 
     }
 
-    private void AddImage()
+    private async Task HandleSelectedImages(InputFileChangeEventArgs e)
     {
-
-    }
-
-    private void RemoveImage(int imageId)
-    {
-        var selectedImage = BookDto.Images.FirstOrDefault(image => image.Id == imageId);
-        if (selectedImage != null) BookDto.Images.Remove(selectedImage);
+        foreach (var file in e.GetMultipleFiles())
+        {
+            var image = await file.RequestImageFileAsync("image/jpeg", maxWith: 640, maxHeight: 480);
+            using Stream fileStream = image.OpenReadStream();
+            using MemoryStream ms = new MemoryStream();
+            await fileStream.CopyToAsync(ms);
+            var imageUri = $"data:image/jpeg;base64,{Convert.ToBase64String(ms.ToArray())}";
+            ImageFiles.Add(imageUri, file);
+        }
     }
 
     private void RemoveTag(string tagName)
@@ -164,7 +172,7 @@
         var selectedTag = _tags.FirstOrDefault(tag => tag.Name.ToLower().Contains(_inputTag));
         if (selectedTag != null &&
             BookDto.Tags.Count <= 10 &&
-            BookDto.Tags.FirstOrDefault(tag => tag.Name==selectedTag.Name) == null)
+            BookDto.Tags.FirstOrDefault(tag => tag.Name == selectedTag.Name) == null)
             BookDto.Tags.Add(selectedTag);
     }
 
