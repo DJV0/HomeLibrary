@@ -1,6 +1,7 @@
 ﻿@page "/CreateBook"
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
 @using AutoMapper
 @using System.IO
 
@@ -102,6 +103,8 @@
     [Inject]
     public AuthorClient AuthorClient { get; set; }
     [Inject]
+    public BookClient BookClient { get; set; }
+    [Inject]
     public IMapper Mapper { get; set; }
 
     public string ISBN { get; set; }
@@ -139,13 +142,44 @@
                 return;
             }
             BookDto = Mapper.Map<BookDto>(OpenLibraryBookDto);
-            BookDto.Images.Add(Mapper.Map<ImageDto>(OpenLibraryBookDto.Book.cover));
+            ImageFiles.Add(Mapper.Map<ImageDto>(OpenLibraryBookDto.Book.cover).Uri, null);
         }
     }
 
-    private void HandleSubmit()
+    private async Task HandleSubmit()
     {
-
+        foreach (var file in ImageFiles)
+        {
+            if(file.Value == null)
+            {
+                BookDto.Images.Add(new ImageDto { Uri = file.Key });
+                continue;
+            }
+            else
+            {
+                var client = new HttpClient() { BaseAddress = new Uri("https://localhost:44333") };
+                var content = new MultipartFormDataContent();
+                using Stream fileStream = file.Value.OpenReadStream(int.MaxValue);
+                using MemoryStream ms = new MemoryStream();
+                await fileStream.CopyToAsync(ms);
+                content.Add(new ByteArrayContent(ms.ToArray()), "files", file.Value.Name);
+                var responce = await client.PostAsync("/api/uploadfiles/upload", content);
+                responce.EnsureSuccessStatusCode();
+                var uriList = await responce.Content.ReadFromJsonAsync<IEnumerable<string>>();
+                foreach (var uri in uriList)
+                {
+                    BookDto.Images.Add(new ImageDto { Uri = uri});
+                }
+            }
+        }
+        var newBook = await BookClient.Create(BookDto);
+        if(newBook == null)
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+            Snackbar.Add("Book wasn't created!", Severity.Warning);
+            return;
+        }
+        NavigationManager.NavigateTo($"/book/{newBook.Id}");
     }
 
     private async Task HandleSelectedImages(InputFileChangeEventArgs e)
