@@ -31,6 +31,13 @@ namespace HomeLibrary.BLL.Services
                 .FirstOrDefaultAsync(book => book.Id == id);
         }
 
+        public override async Task<Book> AddAsync(Book entity)
+        {
+            dbContext.Books.Attach(entity);
+            await dbContext.SaveChangesAsync();
+            return entity;
+        }
+
         public override async Task UpdateAsync(Book entity)
         {
             var dbBook = await GetByIdAsync(entity.Id);

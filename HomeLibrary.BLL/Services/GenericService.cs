@@ -17,7 +17,7 @@ namespace HomeLibrary.BLL.Services
             dbContext = context;
         }
 
-        public async Task<T> AddAsync(T entity)
+        public virtual async Task<T> AddAsync(T entity)
         {
             await dbContext.Set<T>().AddAsync(entity);
             await dbContext.SaveChangesAsync();
