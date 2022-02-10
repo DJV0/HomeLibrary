@@ -38,7 +38,7 @@ namespace HomeLibrary.WebAPI.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<ActionResult> Create([FromBody] TagDto tagDto)
+        public async Task<ActionResult<TagDto>> Create([FromBody] TagDto tagDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var newTag = await _tagService.AddAsync(_mapper.Map<Tag>(tagDto));

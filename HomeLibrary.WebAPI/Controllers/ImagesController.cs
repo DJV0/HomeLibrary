@@ -37,7 +37,7 @@ namespace HomeLibrary.WebAPI.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<ActionResult> Create([FromBody] ImageDto imageDto)
+        public async Task<ActionResult<ImageDto>> Create([FromBody] ImageDto imageDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var newImage = await _imageService.AddAsync(_mapper.Map<Image>(imageDto));

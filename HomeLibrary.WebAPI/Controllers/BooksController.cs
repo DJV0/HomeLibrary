@@ -37,7 +37,7 @@ namespace HomeLibrary.WebAPI.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<ActionResult> Create([FromBody] BookDto bookDto)
+        public async Task<ActionResult<BookDto>> Create([FromBody] BookDto bookDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             var newBook = await _bookService.AddAsync(_mapper.Map<Book>(bookDto));
