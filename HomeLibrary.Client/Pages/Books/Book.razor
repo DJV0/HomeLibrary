@@ -9,13 +9,13 @@
 else
 {
     <dl>
-        <dd><MudText>@BookDto.Title</MudText></dd>
+        <dd><MudText Typo="Typo.h3">@BookDto.Title</MudText></dd>
         <dt>Authors</dt>
         <dd>
             @foreach (var author in BookDto.Authors)
             {
                 var href = $"/author/{author.Id}";
-                <MudLink Href="@href" Class="pa-2" Typo="Typo.h3">@author.FullName</MudLink>
+                <MudLink Href="@href" Class="pa-2" Typo="Typo.body1">@author.FullName</MudLink>
             }
         </dd>
         <dt>ISBN</dt>
@@ -39,7 +39,7 @@ else
                 @foreach (var image in BookDto.Images)
                 {
                     <MudItem xs="3">
-                        <MudCardMedia Image="@image.Url" Height="200" @onclick="@(()=>OpenFullScreenImage(image.Url))"></MudCardMedia>
+                        <MudCardMedia Image="@image.Uri" Height="200" @onclick="@(()=>OpenFullScreenImage(image.Uri))"></MudCardMedia>
                     </MudItem>
                 }
             </MudGrid>
@@ -47,16 +47,32 @@ else
         <dd>
             <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(()=>NavigationManager.NavigateTo($"/editbook/{BookId}"))">Edit</MudButton>
         </dd>
+        <dd>
+            <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="@(()=>_isDelete=true)">Delete</MudButton>
+        </dd>
     </dl>
+    <MudDialog @bind-IsVisible="@_isDelete">
+        <DialogContent>
+            Do you realy want to delete this book?
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="@Cancel" >Cancel</MudButton>
+            <MudButton OnClick="@Delete" Color="Color.Error" Variant="Variant.Filled">Delete</MudButton>
+        </DialogActions>
+    </MudDialog>
 }
 
 @code {
     [Parameter]
     public int BookId { get; set; }
+    public BookDto BookDto { get; set; }
     [Inject]
     public BookClient BookClient { get; set; }
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; }
 
-    public BookDto BookDto { get; set; }
+    private bool _isDelete = false;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -69,5 +85,17 @@ else
         dialogParameters.Add("Url", url);
         var dialogOptions = new DialogOptions() { NoHeader = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
         var dialog = DialogService.Show<FullScreenImageDialog>("", dialogParameters, dialogOptions);
+    }
+
+    public async Task Delete()
+    {
+        await BookClient.Delete(BookId);
+        NavigationManager.NavigateTo("Books");
+    }
+
+    void Cancel()
+    {
+        _isDelete = false;
+        MudDialog.Cancel();
     }
 }
