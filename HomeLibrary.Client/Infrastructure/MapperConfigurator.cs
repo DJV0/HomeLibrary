@@ -14,7 +14,7 @@ namespace HomeLibrary.Client.Infrastructure
             config.CreateMap<OpenLibraryBookDto.Author, AuthorDto>()
                 .ForMember(authorDto => authorDto.FullName, opt => opt.MapFrom(apiAuthor => apiAuthor.name));
             config.CreateMap<OpenLibraryBookDto.Cover, ImageDto>()
-                .ForMember(imageDto => imageDto.Url, opt => opt.MapFrom(cover => cover.large));
+                .ForMember(imageDto => imageDto.Uri, opt => opt.MapFrom(cover => cover.large));
             config.CreateMap<OpenLibraryBookDto, BookDto>()
                 .ForMember(bookDto => bookDto.ISBN, opt => opt.MapFrom(apiBook => apiBook.Book.identifiers.isbn_13.FirstOrDefault()))
                 .ForMember(bookDto => bookDto.Title, opt => opt.MapFrom(apiBook => apiBook.Book.title))
