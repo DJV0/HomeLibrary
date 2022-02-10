@@ -30,10 +30,9 @@ namespace HomeLibrary.Client.HttpClients
 
         public async Task<T> Create(T entity)
         {
-            var response = await httpClient.PostAsJsonAsync(_requestUri, entity);
+            var response = await httpClient.PostAsJsonAsync($"{_requestUri}/create", entity);
             response.EnsureSuccessStatusCode();
-            var stream = await response.Content.ReadAsStreamAsync();
-            return await JsonSerializer.DeserializeAsync<T>(stream);
+            return await response.Content.ReadFromJsonAsync<T>();
         }
 
         public async Task<bool> Update(int id, T entity)

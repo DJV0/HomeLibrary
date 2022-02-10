@@ -28,8 +28,6 @@ namespace HomeLibrary.Client
             builder.Services.AddHttpClient<ImageClient>();
             builder.Services.AddHttpClient<BookClient>();
             builder.Services.AddHttpClient<TagClient>();
-            builder.Services.AddSingleton(opt => 
-                new UploadFileService(builder.Configuration.GetConnectionString("AzureBlobStorage")));
 
             var mapperConfiguration = new MapperConfiguration(config =>
             {

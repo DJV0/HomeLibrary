@@ -18,7 +18,7 @@ else
 	    {
         <MudItem xs="4">
             <MudCard>
-                <MudCardMedia Image="@book.Images.FirstOrDefault().Url" Height="200" />
+                <MudCardMedia Image="@book.Images.FirstOrDefault().Uri" Height="200" />
                 <MudCardHeader>
                     <CardHeaderContent>
                         <MudText Typo="Typo.h6">@book.Title</MudText>
@@ -50,7 +50,7 @@ else
     public BookClient BookClient { get; set; }
 
     private int _selectedPagination = 1;
-    private int _elementsPerPage = 1;
+    private int _elementsPerPage = 15;
     private string _filter = String.Empty;
     private ICollection<BookDto> _books;
     public IEnumerable<BookDto> _filteredBooks => _books.Where(book => book.Title.ToLower().Contains(_filter));

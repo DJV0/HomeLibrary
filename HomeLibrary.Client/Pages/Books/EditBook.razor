@@ -74,7 +74,7 @@ else
                     @foreach (var image in BookDto.Images)
                     {
                         <MudItem xs="3">
-                            <MudCardMedia Image="@image.Url" Height="200" @onclick="@(()=>RemoveImage(image.Id))"></MudCardMedia>
+                            <MudCardMedia Image="@image.Uri" Height="200" @onclick="@(()=>RemoveImage(image.Id))"></MudCardMedia>
                         </MudItem>
                     }
                 </MudGrid>
