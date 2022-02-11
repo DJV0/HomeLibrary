@@ -117,6 +117,7 @@
     protected override async Task OnInitializedAsync()
     {
         _tags = await TagClient.GetAll();
+        _authors = await AuthorClient.GetAll();
         var dialogParameters = new DialogParameters();
         dialogParameters.Add("ISBN", ISBN);
         var dialog = await DialogService.Show<CreateBookDialog>
@@ -125,23 +126,24 @@
                 dialogParameters,
                 new DialogOptions() { DisableBackdropClick = true }
             ).Result;
-        if (dialog.Cancelled)
-        {
-            _authors = await AuthorClient.GetAll();
-            return;
-        }
         if (dialog.Data != null)
         {
             ISBN = dialog.Data as string;
             OpenLibraryBookDto = await OpenLibraryClient.GetBook(ISBN);
             if (OpenLibraryBookDto.Book == null)
             {
-                _authors = await AuthorClient.GetAll();
                 Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
                 Snackbar.Add("Book wasn't founded!", Severity.Warning);
                 return;
             }
             BookDto = Mapper.Map<BookDto>(OpenLibraryBookDto);
+            foreach (var author in BookDto.Authors)
+            {
+                if (_authors.Any(a => a.FullName == author.FullName))
+                {
+                    author.Id = _authors.First(a => a.FullName == author.FullName).Id;
+                }
+            }
             ImageFiles.Add(Mapper.Map<ImageDto>(OpenLibraryBookDto.Book.cover).Uri, null);
         }
     }
@@ -165,10 +167,10 @@
                 content.Add(new ByteArrayContent(ms.ToArray()), "files", file.Value.Name);
                 var responce = await client.PostAsync("/api/uploadfiles/upload", content);
                 responce.EnsureSuccessStatusCode();
-                var uriList = await responce.Content.ReadFromJsonAsync<IEnumerable<string>>();
-                foreach (var uri in uriList)
+                var uriList = await responce.Content.ReadFromJsonAsync<IDictionary<string, string>>();
+                foreach (var item in uriList)
                 {
-                    BookDto.Images.Add(new ImageDto { Uri = uri});
+                    BookDto.Images.Add(new ImageDto { FileName = item.Key, Uri = item.Value });
                 }
             }
         }
