@@ -12,6 +12,7 @@ namespace HomeLibrary.Shared.Dto
 
         [Required(ErrorMessage = "Enter image url")]
         public string Uri { get; set; }
+        public string FileName { get; set; }
 
         [Required(ErrorMessage ="Enter book id")]
         public int BookId { get; set; }

@@ -16,6 +16,7 @@ namespace HomeLibrary.DAL.Configuration
             builder.HasKey(image => image.Id);
             builder.Property(image => image.Uri).IsRequired();
             builder.HasIndex(image => image.Uri).IsUnique();
+            builder.HasIndex(image => image.FileName).IsUnique();
 
             builder.HasData(
                 new Image { Id = 1, Uri = "image1", BookId = 1 },
