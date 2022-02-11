@@ -17,25 +17,35 @@ namespace HomeLibrary.UploadFiles
             _connectionString = connectionString;
         }
 
-        public async Task<IEnumerable<string>> UploadAsync(IFormFileCollection files)
+        public async Task<IDictionary<string, string>> UploadAsync(IFormFileCollection files)
         {
-            List<string> uriList = new List<string>();
+            Dictionary<string, string> uriList = new Dictionary<string, string>();
             foreach (var file in files)
             {
                 if(file.Length > 0)
                 {
+                    string fileName = file.FileName;
                     var blobContainerClient = new BlobContainerClient(_connectionString, _blobContainerName);
-                    var createResponse = await blobContainerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
-
-                    BlobClient blobClient = blobContainerClient.GetBlobClient(file.FileName);
-                    using (var fileStream = file.OpenReadStream())
+                    await blobContainerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+                    var blobClient = blobContainerClient.GetBlobClient(fileName);
+                    if ((await blobClient.ExistsAsync()).Value)
                     {
-                        await blobClient.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = file.ContentType });
+                        Random rnd = new Random((int)DateTime.Now.Ticks);
+                        fileName = "image_" + rnd.Next().ToString() + fileName;
+                        blobClient = blobContainerClient.GetBlobClient(fileName);
                     }
-                    uriList.Add(blobClient.Uri.ToString());
+                    await blobContainerClient.UploadBlobAsync(fileName, file.OpenReadStream());
+                    uriList.Add(fileName, blobClient.Uri.ToString());
                 }
             }
             return uriList;
+        }
+
+        public async Task DeleteAsync(string fileName)
+        {
+            var blobContainerClient = new BlobContainerClient(_connectionString, _blobContainerName);
+            var blobClient = blobContainerClient.GetBlobClient(fileName);
+            await blobClient.DeleteIfExistsAsync();
         }
     }
 }
