@@ -3,14 +3,16 @@ using HomeLibrary.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HomeLibrary.DAL.Migrations
 {
     [DbContext(typeof(HomeLibraryDbContext))]
-    partial class HomeLibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220211130438_ChangeAuthorName")]
+    partial class ChangeAuthorName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -188,9 +190,6 @@ namespace HomeLibrary.DAL.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Uri")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -198,10 +197,6 @@ namespace HomeLibrary.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
-
-                    b.HasIndex("FileName")
-                        .IsUnique()
-                        .HasFilter("[FileName] IS NOT NULL");
 
                     b.HasIndex("Uri")
                         .IsUnique();
