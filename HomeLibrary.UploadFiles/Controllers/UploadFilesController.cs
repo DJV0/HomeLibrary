@@ -25,5 +25,12 @@ namespace HomeLibrary.UploadFiles.Controllers
             var uri = await UploadFilesService.UploadAsync(files);
             return Ok(uri);
         }
+
+        [HttpDelete("{fileName}")]
+        public async Task<ActionResult> Delete(string fileName)
+        {
+            await UploadFilesService.DeleteAsync(fileName);
+            return NoContent();
+        }
     }
 }
