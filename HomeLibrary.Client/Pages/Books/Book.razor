@@ -89,6 +89,12 @@ else
 
     public async Task Delete()
     {
+        HttpClient httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:44333") };
+        foreach (var image in BookDto.Images.Where(i => i.FileName != null))
+        {
+            var response = await httpClient.DeleteAsync($"/api/uploadfiles/{image.FileName}");
+            response.EnsureSuccessStatusCode();
+        }
         await BookClient.Delete(BookId);
         NavigationManager.NavigateTo("Books");
     }
