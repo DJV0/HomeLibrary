@@ -7,18 +7,6 @@
 
 <div>
     <h1>Hello, world!</h1>
-
-    Welcome to your new app.
-
-    <EditForm Model="@ISBN" OnValidSubmit="@Send">
-        <InputText @bind-Value="@ISBN"></InputText>
-        <button type="submit">Send</button>
-    </EditForm>
-    @if (book.Book != null)
-    {
-        <p>@book.Book.cover.large</p>
-    }
-    <p>@author.FullName</p>
 </div>
 
 @code { 
