@@ -1,4 +1,4 @@
-﻿using HomeLibrary.BLL.DTOs;
+﻿using HomeLibrary.DAL.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HomeLibrary.BLL.Interfaces
 {
-    public interface IBookService : IService<BookDTO>
+    public interface IBookService : IGenericService<Book>
     {
     }
 }

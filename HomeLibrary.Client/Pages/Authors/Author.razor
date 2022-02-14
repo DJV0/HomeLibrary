@@ -1,0 +1,65 @@
+﻿@page "/author/{authorId:int}"
+@inject NavigationManager NavigationManager
+
+@if (AuthorDto == null || _books == null)
+{
+    <MudProgressLinear Color="Color.Primary" Class="my-5" Indeterminate="true"></MudProgressLinear>
+}
+else
+{
+    <h3>@AuthorDto.FullName</h3>
+    <MudTextField Class="ml-2" Style="width: 20%" Margin="Margin.Dense" Immediate="true" @bind-Value="_filter" Variant="Variant.Outlined" Label="Search..." />
+    <MudGrid>
+        @foreach (var book in _filteredBooks.Skip((_selectedPagination - 1) * _elementsPerPage).Take(_elementsPerPage))
+        {
+            <MudItem xs="4">
+                <MudCard>
+                    <MudCardMedia Image="@book.Images.FirstOrDefault().Uri" Height="200" />
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">@book.Title</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <div>
+                            @foreach (var author in book.Authors)
+                            {
+                                var href = $"/author/{author.Id}";
+                                <MudLink Href="@href" Class="pa-2" Typo="Typo.body1">@author.FullName</MudLink>
+                            }
+                        </div>
+                        <MudText Typo="Typo.body2">Published in @book.PublishDate</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="@(()=>NavigationManager.NavigateTo($"/book/{book.Id}"))">Learn More</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+    <div class="d-flex flex-column align-center">
+        <MudPagination @bind-Selected="_selectedPagination" Count="@(_filteredBooks.ToList().Count/_elementsPerPage)"></MudPagination>
+    </div>
+}
+
+@code {
+    private int _selectedPagination = 1;
+    private int _elementsPerPage = 1;
+    private string _filter = String.Empty;
+    private IEnumerable<BookDto> _books;
+
+    [Parameter]
+    public int AuthorId { get; set; }
+    [Inject]
+    public AuthorClient AuthorClient { get; set; }
+    [Inject]
+    public BookClient BookClient { get; set; }
+    public AuthorDto AuthorDto { get; set; }
+    public IEnumerable<BookDto> _filteredBooks => _books.Where(book => book.Title.ToLower().Contains(_filter));
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuthorDto = await AuthorClient.GetById(AuthorId);
+        _books = (await BookClient.GetAll()).Where(book => book.Authors.Any(author => author.Id == AuthorId));
+    }
+}

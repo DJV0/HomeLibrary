@@ -15,7 +15,7 @@ namespace HomeLibrary.DAL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.8")
+                .HasAnnotation("ProductVersion", "5.0.13")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("AuthorBook", b =>
@@ -55,6 +55,38 @@ namespace HomeLibrary.DAL.Migrations
                         });
                 });
 
+            modelBuilder.Entity("BookTag", b =>
+                {
+                    b.Property<int>("BooksId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TagsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BooksId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("BookTag");
+
+                    b.HasData(
+                        new
+                        {
+                            BooksId = 1,
+                            TagsId = 1
+                        },
+                        new
+                        {
+                            BooksId = 1,
+                            TagsId = 3
+                        },
+                        new
+                        {
+                            BooksId = 2,
+                            TagsId = 2
+                        });
+                });
+
             modelBuilder.Entity("HomeLibrary.DAL.Entities.Author", b =>
                 {
                     b.Property<int>("Id")
@@ -62,18 +94,14 @@ namespace HomeLibrary.DAL.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("FirstName")
+                    b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MiddleName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FullName")
+                        .IsUnique();
 
                     b.ToTable("Authors");
 
@@ -81,23 +109,17 @@ namespace HomeLibrary.DAL.Migrations
                         new
                         {
                             Id = 1,
-                            FirstName = "F1",
-                            LastName = "L1",
-                            MiddleName = "M1"
+                            FullName = "F1 L1"
                         },
                         new
                         {
                             Id = 2,
-                            FirstName = "F2",
-                            LastName = "L2",
-                            MiddleName = ""
+                            FullName = "F2 L2"
                         },
                         new
                         {
                             Id = 3,
-                            FirstName = "F3",
-                            LastName = "L3",
-                            MiddleName = "M3"
+                            FullName = "F3 L3"
                         });
                 });
 
@@ -108,11 +130,24 @@ namespace HomeLibrary.DAL.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("ISBN")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("NumberOfPages")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PublishDate")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ISBN")
+                        .IsUnique()
+                        .HasFilter("[ISBN] IS NOT NULL");
 
                     b.ToTable("Books");
 
@@ -120,16 +155,25 @@ namespace HomeLibrary.DAL.Migrations
                         new
                         {
                             Id = 1,
+                            ISBN = "9784353434",
+                            NumberOfPages = 10,
+                            PublishDate = 2013,
                             Title = "Title1"
                         },
                         new
                         {
                             Id = 2,
+                            ISBN = "9784300434",
+                            NumberOfPages = 20,
+                            PublishDate = 2014,
                             Title = "Title2"
                         },
                         new
                         {
                             Id = 3,
+                            ISBN = "9784340434",
+                            NumberOfPages = 30,
+                            PublishDate = 2015,
                             Title = "Title3"
                         });
                 });
@@ -144,7 +188,10 @@ namespace HomeLibrary.DAL.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Url")
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Uri")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
@@ -152,7 +199,11 @@ namespace HomeLibrary.DAL.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.HasIndex("Url")
+                    b.HasIndex("FileName")
+                        .IsUnique()
+                        .HasFilter("[FileName] IS NOT NULL");
+
+                    b.HasIndex("Uri")
                         .IsUnique();
 
                     b.ToTable("Images");
@@ -162,31 +213,67 @@ namespace HomeLibrary.DAL.Migrations
                         {
                             Id = 1,
                             BookId = 1,
-                            Url = "image1"
+                            Uri = "image1"
                         },
                         new
                         {
                             Id = 2,
                             BookId = 2,
-                            Url = "image2"
+                            Uri = "image2"
                         },
                         new
                         {
                             Id = 3,
                             BookId = 3,
-                            Url = "image3"
+                            Uri = "image3"
                         },
                         new
                         {
                             Id = 4,
                             BookId = 1,
-                            Url = "image4"
+                            Uri = "image4"
                         },
                         new
                         {
                             Id = 5,
                             BookId = 2,
-                            Url = "image5"
+                            Uri = "image5"
+                        });
+                });
+
+            modelBuilder.Entity("HomeLibrary.DAL.Entities.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Tags");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "книга 2021"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "музыка"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "наука"
                         });
                 });
 
@@ -201,6 +288,21 @@ namespace HomeLibrary.DAL.Migrations
                     b.HasOne("HomeLibrary.DAL.Entities.Book", null)
                         .WithMany()
                         .HasForeignKey("BooksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BookTag", b =>
+                {
+                    b.HasOne("HomeLibrary.DAL.Entities.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BooksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HomeLibrary.DAL.Entities.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

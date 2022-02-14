@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace HomeLibrary.DAL.Entities
 {
-    public class Image : BaseEntity
+    public class Image
     {
-        [Required]
-        public string Url { get; set; }
+        public int Id { get; set; }
+        public string Uri { get; set; }
+        public string FileName { get; set; }
 
         public int BookId { get; set; }
         public Book Book { get; set; }

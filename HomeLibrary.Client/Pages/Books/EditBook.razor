@@ -1,0 +1,159 @@
+﻿@page "/editbook/{BookId:int}"
+@inject NavigationManager NavigationManager
+
+<h3>Edit Book</h3>
+
+@if (BookDto == null)
+{
+<MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7"/>
+}
+else
+{
+<EditForm Model="BookDto" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudTextField Label="Isbn" Required="true" @bind-Value="BookDto.ISBN" For="@(()=>BookDto.ISBN)" />
+            <MudTextField Label="Title" Required="true" @bind-Value="BookDto.Title" For="@(()=>BookDto.Title)" />
+            <div>
+                <div class="d-inline-block">
+                    Authors
+                    <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="@(()=>_isOpenAuthorPopover = _isOpenAuthorPopover ? false : true)"></MudIconButton>
+                    <MudChipSet AllClosable="true" OnClose="@(chip => RemoveAuthor(chip.Text))">
+                        @foreach (var author in BookDto.Authors)
+                        {
+                            <MudChip Text="@author.FullName"></MudChip>
+                        }
+                    </MudChipSet>
+                    <MudPopover Open="@_isOpenAuthorPopover" Class="pa-4" OverflowBehavior="OverflowBehavior.FlipNever" AnchorOrigin="Origin.CenterRight" TransformOrigin="Origin.CenterLeft">
+                        <MudField>
+                            <input list="Authors" @oninput="@(args => _inputAuthor = args.Value.ToString().ToLower())" placeholder="Type to serch..." aria-describedby="button-add-author" />
+                            <a id="button-add-author" class="btn btn-primary" @onclick="@(()=>AddAuthor())">Add</a>
+                            <datalist id="Authors">
+                                @foreach (var author in filteredAuthors)
+                                {
+                                    <option value="@author.FullName"></option>
+                                }
+                            </datalist>
+                        </MudField>
+                    </MudPopover>
+                </div>
+            </div>
+            <MudTextField Label="Publish date" Required="true" @bind-Value="BookDto.PublishDate" For="@(()=>BookDto.PublishDate)" />
+            <MudTextField Label="Number of pages" Required="true" @bind-Value="BookDto.NumberOfPages" For="@(()=>BookDto.NumberOfPages)" />
+            <div>
+                <div class="d-inline-block">
+                    Tags
+                    <MudIconButton Icon="@Icons.Material.Filled.Add" OnClick="@(()=> _isOpenTagPopover = _isOpenTagPopover ? false : true)"></MudIconButton>
+                    <MudPopover Open="@_isOpenTagPopover" Class="pa-4" OverflowBehavior="OverflowBehavior.FlipNever" AnchorOrigin="Origin.CenterRight" TransformOrigin="Origin.CenterLeft">
+                        <MudField>
+                            <input list="Tags" @oninput="@(args => _inputTag = args.Value.ToString().ToLower())" placeholder="Type to serch..." aria-describedby="button-add-tag" />
+                            <a id="button-add-tag" class="btn btn-primary" @onclick="@(()=>AddTag())">Add</a>
+                            <datalist id="Tags">
+                                @foreach (var tag in filteredTags)
+                                {
+                                    <option value="@tag.Name"></option>
+                                }
+                            </datalist>
+                        </MudField>
+                    </MudPopover>
+                </div>
+                <MudChipSet AllClosable="true" OnClose="@(chip => RemoveTag(chip.Text))">
+                    @foreach (var tag in BookDto.Tags)
+                    {
+                        <MudChip Text="@tag.Name"></MudChip>
+                    }
+                </MudChipSet>
+            </div>
+            <div>
+                <div class="d-inline-block">
+                    Images
+                    <MudIconButton Icon="@Icons.Material.Filled.Add" @onclick="@(()=>AddImage())"></MudIconButton>
+                </div>
+                <MudGrid>
+                    @foreach (var image in BookDto.Images)
+                    {
+                        <MudItem xs="3">
+                            <MudCardMedia Image="@image.Uri" Height="200" Style="width:150px;" @onclick="@(()=>RemoveImage(image.Id))"></MudCardMedia>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </div>
+            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled">Save</MudButton>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+}
+
+@code {
+    private bool _isOpenTagPopover, _isOpenAuthorPopover;
+    private string _inputTag = String.Empty;
+    private string _inputAuthor = String.Empty;
+    private IEnumerable<TagDto> _tags;
+    private IEnumerable<AuthorDto> _authors;
+
+    [Parameter]
+    public int BookId { get; set; }
+    public BookDto BookDto { get; set; }
+    [Inject]
+    public BookClient BookClient { get; set; }
+    [Inject]
+    public TagClient TagClient { get; set; }
+    [Inject]
+    public AuthorClient AuthorClient { get; set; }
+    public IEnumerable<TagDto> filteredTags => _tags.Where(tag => tag.Name.ToLower().Contains(_inputTag));
+    public IEnumerable<AuthorDto> filteredAuthors => _authors.Where(author => author.FullName.ToLower().Contains(_inputAuthor));
+
+    private async Task HandleSubmit()
+    {
+        bool result = await BookClient.Update(BookId, BookDto);
+        if(result) NavigationManager.NavigateTo($"/book/{BookId}");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        BookDto = await BookClient.GetById(BookId);
+        _authors = await AuthorClient.GetAll();
+        _tags = await TagClient.GetAll();
+    }
+
+    private void AddImage()
+    {
+
+    }
+
+    private void RemoveImage(int imageId)
+    {
+        var selectedImage = BookDto.Images.FirstOrDefault(image => image.Id == imageId);
+        if (selectedImage != null) BookDto.Images.Remove(selectedImage);
+    }
+
+    private void RemoveTag(string tagName)
+    {
+        var tag = BookDto.Tags.FirstOrDefault(tag => tag.Name == tagName);
+        BookDto.Tags.Remove(tag);
+    }
+
+    private void AddTag()
+    {
+        var selectedTag = _tags.FirstOrDefault(tag => tag.Name.ToLower().Contains(_inputTag));
+        if (selectedTag != null &&
+            BookDto.Tags.Count <= 10 &&
+            BookDto.Tags.FirstOrDefault(tag => tag.Name == selectedTag.Name) == null)
+            BookDto.Tags.Add(selectedTag);
+    }
+
+    private void AddAuthor()
+    {
+        var selectedAuthor = _authors.FirstOrDefault(author => author.FullName.ToLower().Contains(_inputAuthor));
+        if (selectedAuthor != null && BookDto.Authors.FirstOrDefault(author => author.Id == selectedAuthor.Id) == null)
+            BookDto.Authors.Add(selectedAuthor);
+    }
+
+    private void RemoveAuthor(string authorName)
+    {
+        var author = BookDto.Authors.FirstOrDefault(author => author.FullName == authorName);
+        BookDto.Authors.Remove(author);
+    }
+}

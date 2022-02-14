@@ -1,67 +1,51 @@
 ﻿using AutoMapper;
-using HomeLibrary.BLL.DTOs;
+using HomeLibrary.BLL.Infrastructure;
 using HomeLibrary.BLL.Interfaces;
 using HomeLibrary.DAL;
 using HomeLibrary.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace HomeLibrary.BLL.Services
 {
-    public class BookService : IBookService
+    public class BookService : GenericService<Book>, IBookService
     {
-        private readonly HomeLibraryDbContext _context;
-        private readonly IMapper _mapper;
-        public BookService(HomeLibraryDbContext context, IMapper mapper)
+        public BookService(HomeLibraryDbContext context) : base(context) { }
+
+        public override async Task<ICollection<Book>> GetAllAsync()
         {
-            _context = context;
-            _mapper = mapper;
+            return await dbContext.Books
+                .Include(book => book.Authors)
+                .Include(book => book.Images)
+                .Include(book => book.Tags)
+                .ToListAsync();
+        }
+        public override async Task<Book> GetByIdAsync(int id)
+        {
+            return await dbContext.Books
+                .Include(book => book.Authors)
+                .Include(book => book.Images)
+                .Include(book => book.Tags)
+                .FirstOrDefaultAsync(book => book.Id == id);
         }
 
-        public async Task<BookDTO> AddAsync(BookDTO entity)
+        public override async Task<Book> AddAsync(Book entity)
         {
-            var author = _mapper.Map<Book>(entity);
-            if (await ExistBook(author.Id)) throw new ArgumentException("The enter book id has already existed");
-            await _context.Books.AddAsync(author);
-            await _context.SaveChangesAsync();
-            return _mapper.Map<BookDTO>(author);
+            dbContext.Books.Attach(entity);
+            await dbContext.SaveChangesAsync();
+            return entity;
         }
 
-        public async Task DeleteAsync(int id)
+        public override async Task UpdateAsync(Book entity)
         {
-            var book = await _context.Books.FindAsync(id);
-            if(book == null) throw new ArgumentException("The enter book id doesn't exist.");
-            _context.Books.Remove(book);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<ICollection<BookDTO>> GetAllAsync()
-        {
-            var books = await _context.Books.ToListAsync();
-            return _mapper.Map<List<BookDTO>>(books);
-        }
-
-        public async Task<BookDTO> GetAsync(int id)
-        {
-            var book = await _context.Books.FirstOrDefaultAsync(book => book.Id == id);
-            return _mapper.Map<BookDTO>(book);
-        }
-
-        public async Task UpdateAsync(BookDTO entity)
-        {
-            var book = await _context.Books.FindAsync(entity.Id);
-            if (book == null) throw new ArgumentException("The enter book doesn't exist.");
-            _context.Entry(book).CurrentValues.SetValues(entity);
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task<bool> ExistBook(int id)
-        {
-            return await _context.Books.FindAsync(id) != null;
+            var dbBook = await GetByIdAsync(entity.Id);
+            dbBook.Authors.UpdateData(entity.Authors);
+            dbBook.Images.UpdateData(entity.Images);
+            dbBook.Tags.UpdateData(entity.Tags);
+            dbContext.Entry(dbBook).CurrentValues.SetValues(entity);
+            await dbContext.SaveChangesAsync();
         }
     }
 }

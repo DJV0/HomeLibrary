@@ -1,0 +1,107 @@
+﻿@page "/book/{bookId:int}"
+@inject IDialogService DialogService
+@inject NavigationManager NavigationManager
+
+@if (BookDto == null)
+{
+    <MudProgressLinear Color="Color.Primary" Class="my-5" Indeterminate="true"></MudProgressLinear>
+}
+else
+{
+    <dl>
+        <dd><MudText Typo="Typo.h3">@BookDto.Title</MudText></dd>
+        <dt>Authors</dt>
+        <dd>
+            @foreach (var author in BookDto.Authors)
+            {
+                var href = $"/author/{author.Id}";
+                <MudLink Href="@href" Class="pa-2" Typo="Typo.body1">@author.FullName</MudLink>
+            }
+        </dd>
+        <dt>ISBN</dt>
+        <dd>@BookDto.ISBN</dd>
+        <dt>Publish date</dt>
+        <dd>@BookDto.PublishDate</dd>
+        <dt>Number of pages</dt>
+        <dd>@BookDto.NumberOfPages</dd>
+        <dt>Tags</dt>
+        <dd>
+            <MudChipSet>
+                @foreach (var tag in BookDto.Tags)
+                {
+                    <MudChip Text="@tag.Name"></MudChip>
+                }
+            </MudChipSet>
+        </dd>
+        <dt>Images</dt>
+        <dd>
+            <MudGrid>
+                @foreach (var image in BookDto.Images)
+                {
+                    <MudItem xs="3">
+                        <MudCardMedia Image="@image.Uri" Height="200" Style="width:150px;" @onclick="@(()=>OpenFullScreenImage(image.Uri))"></MudCardMedia>
+                    </MudItem>
+                }
+            </MudGrid>
+        </dd>
+        <dd>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@(()=>NavigationManager.NavigateTo($"/editbook/{BookId}"))">Edit</MudButton>
+        </dd>
+        <dd>
+            <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="@(()=>_isDelete=true)">Delete</MudButton>
+        </dd>
+    </dl>
+    <MudDialog @bind-IsVisible="@_isDelete">
+        <DialogContent>
+            Do you realy want to delete this book?
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="@Cancel" >Cancel</MudButton>
+            <MudButton OnClick="@Delete" Color="Color.Error" Variant="Variant.Filled">Delete</MudButton>
+        </DialogActions>
+    </MudDialog>
+}
+
+@code {
+    [Parameter]
+    public int BookId { get; set; }
+    public BookDto BookDto { get; set; }
+    [Inject]
+    public BookClient BookClient { get; set; }
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; }
+
+    private bool _isDelete = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        BookDto = await BookClient.GetById(BookId);
+    }
+
+    private void OpenFullScreenImage(string url)
+    {
+        var dialogParameters = new DialogParameters();
+        dialogParameters.Add("Url", url);
+        var dialogOptions = new DialogOptions() { NoHeader = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
+        var dialog = DialogService.Show<FullScreenImageDialog>("", dialogParameters, dialogOptions);
+    }
+
+    public async Task Delete()
+    {
+        HttpClient httpClient = new HttpClient { BaseAddress = new Uri("https://localhost:44333") };
+        foreach (var image in BookDto.Images.Where(i => i.FileName != null))
+        {
+            var response = await httpClient.DeleteAsync($"/api/uploadfiles/{image.FileName}");
+            response.EnsureSuccessStatusCode();
+        }
+        await BookClient.Delete(BookId);
+        NavigationManager.NavigateTo("Books");
+    }
+
+    void Cancel()
+    {
+        _isDelete = false;
+        MudDialog.Cancel();
+    }
+}
