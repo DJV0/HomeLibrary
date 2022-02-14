@@ -79,7 +79,7 @@
                     @foreach (var imageUri in ImageFiles)
                     {
                         <MudItem xs="3">
-                            <MudCardMedia Image="@imageUri.Key" Height="200" @onclick="@(()=>ImageFiles.Remove(imageUri.Key))"></MudCardMedia>
+                            <MudCardMedia Image="@imageUri.Key" Height="200" Style="width:150px;" @onclick="@(()=>ImageFiles.Remove(imageUri.Key))"></MudCardMedia>
                         </MudItem>
                     }
                 </MudGrid>

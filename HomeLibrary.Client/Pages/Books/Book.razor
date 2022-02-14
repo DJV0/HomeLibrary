@@ -39,7 +39,7 @@ else
                 @foreach (var image in BookDto.Images)
                 {
                     <MudItem xs="3">
-                        <MudCardMedia Image="@image.Uri" Height="200" @onclick="@(()=>OpenFullScreenImage(image.Uri))"></MudCardMedia>
+                        <MudCardMedia Image="@image.Uri" Height="200" Style="width:150px;" @onclick="@(()=>OpenFullScreenImage(image.Uri))"></MudCardMedia>
                     </MudItem>
                 }
             </MudGrid>
