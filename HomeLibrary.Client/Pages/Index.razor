@@ -1,31 +1,5 @@
 ﻿@page "/"
-@using HomeLibrary.Client.HttpClients
-@using HomeLibrary.Shared.Dto
-@using HomeLibrary.Client.Infrastructure
-@inject OpenLibraryClient openLibraryClient
-@inject AuthorClient authorClient
 
 <div>
     <h1>Hello, world!</h1>
 </div>
-
-@code { 
-    public string ISBN { get; set; } = String.Empty;
-    OpenLibraryBookDto book = new OpenLibraryBookDto();
-    AuthorDto author = new AuthorDto();
-
-    [Parameter]
-    public string ImgUrl { get; set; }
-    [Parameter]
-    public EventCallback<string> OnChange { get; set; }
-
-    private async Task Send()
-    {
-        book = await openLibraryClient.GetBook(ISBN);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        author = await authorClient.GetById(1);
-    }
-}
